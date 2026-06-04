@@ -1,0 +1,246 @@
+# SOC 2 Trust Services Criteria crosswalk for OpenWright.
+#
+# Maintainer-authored, rigorously cited, NOT a legal/audit interpretation (R-01,
+# C-03). This crosswalk is PENDING qualified specialist review (V16): the SOC 2
+# Trust Services Criteria are published by the AICPA, the criterion identifiers
+# below are cited for traceability, and each `quote` is a short verbatim extract
+# of the criterion text from the 2017 TSC (with revised points of focus, 2022).
+# The full normative document is paywalled; the canonical landing page is cited
+# as the primary-source URL and any wording uncertainty is recorded in `notes`.
+#
+# It maps runtime agent evidence to a subset of the Common Criteria (CC-series)
+# and the Processing Integrity criteria. It produces EVIDENCE that controls were
+# exercised; it is NOT a SOC 2 report or an auditor's opinion (see disclaimer).
+
+crosswalk:
+  id: soc2
+  title: "SOC 2 Trust Services Criteria (AICPA 2017, rev. 2022) — Common Criteria + Processing Integrity subset"
+  version: "1.1.0"
+  source: "AICPA Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy (2017, with revised points of focus 2022)"
+  reviewed_as_of: "2026-06-01"
+  description: >
+    Maps runtime agent evidence to a subset of the SOC 2 Trust Services Criteria:
+    CC3.2 (risk identification/analysis), CC5.2 (control activities over
+    technology / human oversight of automated decisions), CC7.2 (monitoring for
+    anomalies), CC7.3 (security-event evaluation), CC7.4 (incident response),
+    CC8.1 (change management), and PI1.2 (processing integrity over system
+    inputs). Covers the minimum required by FR-MAP-03/09.
+  disclaimer: >
+    This crosswalk produces EVIDENCE that controls were exercised at runtime. It
+    does NOT constitute a SOC 2 report, certification, attestation, or an
+    auditor's opinion; a SOC 2 examination is performed by an independent
+    licensed CPA firm. Mappings are maintainer-authored and pending qualified
+    specialist review (NFR-MNT-03, V16).
+
+  controls:
+    - id: cc7.2-system-monitoring
+      title: "CC7.2 — Monitoring of system components for anomalies"
+      requirement: >
+        All agent operational events are continuously recorded in an append-only,
+        tamper-evident log, providing the monitoring substrate CC7.2 expects so
+        anomalies can be detected and analysed.
+      citation:
+        instrument: "AICPA Trust Services Criteria"
+        clause: "CC7.2"
+        url: "https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022"
+        quote: >
+          The entity monitors system components and the operation of those
+          components for anomalies that are indicative of malicious acts, natural
+          disasters, and errors affecting the entity's ability to meet its
+          objectives; anomalies are analyzed to determine whether they represent
+          security events.
+        notes: >
+          Criterion text from the 2017 TSC (revised points of focus, 2022); the
+          full standard is paywalled, so the canonical AICPA landing page is cited.
+      scope:
+        kind: ["llm_call", "tool_call", "agent_decision", "human_approval", "risk_classification", "policy_decision", "incident"]
+      condition:
+        type: committed
+      empty_scope: insufficient_evidence
+      # Monitoring is a completeness obligation: a self-attested evidence_gap
+      # marker (dropped/lost spans) means the monitoring substrate is incomplete,
+      # so the control cannot be satisfied while a gap is attested (U1, V8).
+      completeness_sensitive: true
+      rationale: >
+        The append-only Merkle ledger is the monitoring substrate; an event's
+        presence in it (with an inclusion proof) is the evidence. Because the log
+        self-attests its own gaps, an attested evidence_gap downgrades this
+        control rather than passing silently.
+
+    - id: cc3.2-risk-identification
+      title: "CC3.2 — Identification and analysis of risks to objectives"
+      requirement: >
+        Each risk-classification event records a documented rationale reference,
+        evidencing that the risk to objectives was identified and analysed rather
+        than merely labelled.
+      citation:
+        instrument: "AICPA Trust Services Criteria"
+        clause: "CC3.2"
+        url: "https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022"
+        quote: >
+          The entity identifies risks to the achievement of its objectives across
+          the entity and analyzes risks as a basis for determining how the risks
+          should be managed.
+        notes: >
+          Criterion text from the 2017 TSC (revised points of focus, 2022); full
+          standard paywalled, canonical AICPA landing page cited.
+      scope:
+        kind: ["risk_classification"]
+      condition:
+        type: any_of
+        conditions:
+          - { type: field, path: "risk.rationale_ref", op: exists }
+          - { type: field, path: "attributes.risk_rationale", op: exists }
+      empty_scope: insufficient_evidence
+      rationale: >
+        A risk classification with a rationale reference is the runtime artefact
+        that a CC3.2 risk-identification/analysis process produces.
+
+    - id: cc5.2-control-activities-oversight
+      title: "CC5.2 — Control activities over technology (human oversight of automated decisions)"
+      requirement: >
+        Every high-risk agent decision is linked to a recorded human-approval
+        event whose oversight status is 'approved', evidencing the control
+        activity (human authorisation) over the automated processing.
+      citation:
+        instrument: "AICPA Trust Services Criteria"
+        clause: "CC5.2"
+        url: "https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022"
+        quote: >
+          The entity also selects and develops general control activities over
+          technology to support the achievement of objectives.
+        notes: >
+          Mapping human authorisation of high-risk automated decisions to CC5.2
+          general control activities over technology is an interpretation; full
+          standard paywalled, canonical AICPA landing page cited.
+      scope:
+        kind: ["agent_decision"]
+        risk_classification: ["high"]
+      condition:
+        type: linked
+        link: approval_ref
+        target:
+          kind: ["human_approval"]
+          oversight_status: ["approved"]
+      empty_scope: insufficient_evidence
+      rationale: >
+        An unapproved high-risk agent_decision (no linked approved human_approval)
+        is not_satisfied here — the control activity over the automated decision
+        was not exercised.
+
+    - id: cc7.3-security-event-evaluation
+      title: "CC7.3 — Evaluation of security events"
+      requirement: >
+        Each recorded incident carries a classified severity (or impact) attribute
+        and a documented rationale reference, evidencing that the security event
+        was evaluated to determine whether it could affect the entity's objectives.
+      citation:
+        instrument: "AICPA Trust Services Criteria"
+        clause: "CC7.3"
+        url: "https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022"
+        quote: >
+          The entity evaluates security events to determine whether they could or
+          have resulted in a failure of the entity to meet its objectives
+          (security incidents) and, if so, takes actions to prevent or address
+          such failures.
+        notes: >
+          Criterion text from the 2017 TSC (revised points of focus, 2022); full
+          standard paywalled, canonical AICPA landing page cited.
+      scope:
+        kind: ["incident"]
+      condition:
+        type: any_of
+        conditions:
+          - { type: field, path: "attributes.severity", op: exists }
+          - { type: field, path: "attributes.impact", op: exists }
+          - { type: field, path: "risk.classification", op: exists }
+      empty_scope: insufficient_evidence
+
+    - id: cc7.4-incident-response
+      title: "CC7.4 — Response to identified security incidents"
+      requirement: >
+        Every recorded incident has full task provenance back to its root task and
+        records a response/reporting deadline window, evidencing that a defined
+        incident-response process was engaged.
+      citation:
+        instrument: "AICPA Trust Services Criteria"
+        clause: "CC7.4"
+        url: "https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022"
+        quote: >
+          The entity responds to identified security incidents by executing a
+          defined incident response program to understand, contain, remediate, and
+          communicate security incidents, as appropriate.
+        notes: >
+          Criterion text from the 2017 TSC (revised points of focus, 2022); full
+          standard paywalled, canonical AICPA landing page cited.
+      scope:
+        kind: ["incident"]
+      condition:
+        type: all_of
+        conditions:
+          - { type: field, path: "provenance.root_task_id", op: exists }
+          - { type: field, path: "attributes.report_deadline_days", op: exists }
+      empty_scope: insufficient_evidence
+
+    - id: cc8.1-change-management
+      title: "CC8.1 — Authorisation and approval of changes"
+      requirement: >
+        Each policy-decision event (a runtime configuration/policy change) is
+        recorded in the tamper-evident log and carries either an oversight status
+        of 'approved' or a linked approving human-approval event, evidencing the
+        authorise/approve step CC8.1 requires before changes are implemented.
+      citation:
+        instrument: "AICPA Trust Services Criteria"
+        clause: "CC8.1"
+        url: "https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022"
+        quote: >
+          The entity authorizes, designs, develops or acquires, configures,
+          documents, tests, approves, and implements changes to infrastructure,
+          data, software, and procedures to meet its objectives.
+        notes: >
+          Criterion text from the 2017 TSC (revised points of focus, 2022); full
+          standard paywalled, canonical AICPA landing page cited.
+      scope:
+        kind: ["policy_decision"]
+      condition:
+        type: any_of
+        conditions:
+          - { type: field, path: "oversight.status", op: eq, value: "approved" }
+          - type: linked
+            link: approval_ref
+            target:
+              kind: ["human_approval"]
+              oversight_status: ["approved"]
+      empty_scope: insufficient_evidence
+      rationale: >
+        A policy/configuration change committed to the ledger with an approval
+        (status or linked approver) is the runtime evidence of the CC8.1
+        authorise/approve gate; an unapproved change is not_satisfied.
+
+    - id: pi1.2-processing-integrity-inputs
+      title: "PI1.2 — Completeness and accuracy of system inputs"
+      requirement: >
+        Each model and tool invocation records a reference to its inputs (an input
+        or arguments reference) or input-token accounting, evidencing controls
+        over the completeness and accuracy of system inputs.
+      citation:
+        instrument: "AICPA Trust Services Criteria"
+        clause: "PI1.2"
+        url: "https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022"
+        quote: >
+          The entity implements policies and procedures over system inputs,
+          including controls over completeness and accuracy, to result in
+          products, services, and reporting to meet the entity's objectives.
+        notes: >
+          Processing Integrity (PI) criteria apply only when the engagement scope
+          includes the Processing Integrity category; full standard paywalled,
+          canonical AICPA landing page cited.
+      scope:
+        kind: ["llm_call", "tool_call"]
+      condition:
+        type: any_of
+        conditions:
+          - { type: field, path: "io.input_ref", op: exists }
+          - { type: field, path: "io.arguments_ref", op: exists }
+          - { type: field, path: "io.input_tokens", op: exists }
+      empty_scope: insufficient_evidence

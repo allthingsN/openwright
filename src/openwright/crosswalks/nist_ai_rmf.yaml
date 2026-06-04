@@ -1,0 +1,204 @@
+# NIST AI Risk Management Framework crosswalk for OpenWright.
+#
+# Maintainer-authored and rigorously cited, but NOT a NIST endorsement, a
+# conformity assessment, or an audit opinion (R-01, C-03). The AI RMF is
+# *voluntary* guidance and its subcategories are stated at the policy/process
+# level; mapping concrete runtime evidence to them is an interpretation, cited
+# here to the closest normative anchors (the AI RMF 1.0 Appendix A subcategory
+# text). PENDING QUALIFIED SPECIALIST REVIEW (V16) before any "reviewed-by"
+# attestation is added.
+#
+# Subcategory quotes below are taken verbatim from NIST AI 100-1 (AI RMF 1.0,
+# January 2023), Appendix A "Descriptions of AI Actor Tasks" / the GOVERN, MAP,
+# MEASURE and MANAGE category tables. The framework is a single PDF and does not
+# expose stable per-subcategory anchor URLs, so each citation points at the
+# official NIST PDF and names the subcategory in 'clause'; re-verify the exact
+# wording against that PDF before relying on it.
+crosswalk:
+  id: nist-ai-rmf
+  title: "NIST AI Risk Management Framework (AI RMF 1.0) — GOVERN/MAP/MEASURE/MANAGE subset"
+  version: "1.1.0"
+  source: "NIST AI 100-1, AI Risk Management Framework (AI RMF 1.0), January 2023 (DOI: 10.6028/NIST.AI.100-1)"
+  reviewed_as_of: "2026-06-01"
+  description: >
+    Maps runtime agent evidence to AI RMF 1.0 subcategories spanning all four
+    functions: GOVERN (legal/regulatory requirements understood; human-AI
+    oversight roles), MAP (context and risk classification established), MEASURE
+    (production monitoring; transparency and accountability documented), and
+    MANAGE (post-deployment monitoring and incident response). Covers the
+    minimum required by FR-MAP-02/09.
+  disclaimer: >
+    This crosswalk produces EVIDENCE that specific controls were exercised at
+    runtime. It does NOT constitute a NIST conformity assessment, certification,
+    endorsement, or an audit opinion. The AI RMF is voluntary guidance; these
+    mappings are maintainer-authored and PENDING qualified specialist review
+    (V16). Determinations of conformance are reserved for qualified assessors.
+
+  controls:
+    - id: govern-1.1
+      title: "GOVERN 1.1 — Legal and regulatory requirements understood, managed, and documented"
+      requirement: >
+        Every operational event the agent produces is automatically recorded in
+        an append-only, tamper-evident log, providing the documented record that
+        evidences how legal and regulatory requirements are managed. Because this
+        is a record-completeness obligation, a self-attested evidence gap fails it.
+      citation:
+        instrument: "NIST AI RMF 1.0"
+        clause: "GOVERN 1.1"
+        url: "https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf"
+        quote: "Legal and regulatory requirements involving AI are understood, managed, and documented."
+        effective_date: "2023-01-26"
+        notes: >
+          Quote is the GOVERN 1.1 subcategory text from NIST AI 100-1 Appendix A;
+          the PDF has no per-subcategory anchor, so the URL is the official PDF.
+      scope:
+        kind: ["llm_call", "tool_call", "agent_decision", "human_approval", "risk_classification", "policy_decision", "incident"]
+      condition: { type: committed }
+      empty_scope: insufficient_evidence
+      # Documentation of how requirements are managed is a *completeness*
+      # obligation: a self-attested evidence_gap marker (dropped/lost events)
+      # means the record is not complete, so this cannot be satisfied while a gap
+      # is attested (U1, V8).
+      completeness_sensitive: true
+      rationale: >
+        The append-only Merkle ledger is the documentation substrate; an event's
+        presence in it (with an inclusion proof) is the evidence. Because the log
+        self-attests its own gaps, an attested evidence_gap downgrades this
+        control rather than passing silently.
+
+    - id: govern-3.2
+      title: "GOVERN 3.2 — Roles and responsibilities for human-AI oversight"
+      requirement: >
+        Each high-risk agent decision is linked to a recorded human-oversight
+        (approval) event whose oversight status is 'approved', evidencing that the
+        defined oversight configuration was actually exercised.
+      citation:
+        instrument: "NIST AI RMF 1.0"
+        clause: "GOVERN 3.2"
+        url: "https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf"
+        quote: "Policies and procedures are in place to define and differentiate roles and responsibilities for human-AI configurations and oversight of AI systems."
+        effective_date: "2023-01-26"
+        notes: >
+          Quote is the GOVERN 3.2 subcategory text from NIST AI 100-1 Appendix A;
+          the PDF has no per-subcategory anchor, so the URL is the official PDF.
+      scope: { kind: ["agent_decision"], risk_classification: ["high"] }
+      condition:
+        type: linked
+        link: approval_ref
+        target: { kind: ["human_approval"], oversight_status: ["approved"] }
+      empty_scope: insufficient_evidence
+
+    - id: map-1.1
+      title: "MAP 1.1 — System context and intended purpose established and documented"
+      requirement: >
+        Each agent decision carries the task/context provenance that establishes
+        the operating context in which the system is deployed (the context
+        understood and documented under the MAP function).
+      citation:
+        instrument: "NIST AI RMF 1.0"
+        clause: "MAP 1.1"
+        url: "https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf"
+        quote: "Intended purposes, potentially beneficial uses, context-specific laws, norms and expectations, and prospective settings in which the AI system will be deployed are understood and documented."
+        effective_date: "2023-01-26"
+        notes: >
+          Quote is the MAP 1.1 subcategory text from NIST AI 100-1 Appendix A;
+          the PDF has no per-subcategory anchor, so the URL is the official PDF.
+      scope: { kind: ["agent_decision"] }
+      condition:
+        type: any_of
+        conditions:
+          - { type: field, path: "provenance.context_id", op: exists }
+          - { type: field, path: "provenance.task_id", op: exists }
+      empty_scope: insufficient_evidence
+      rationale: >
+        Provenance (context_id/task_id) is the runtime trace of the deployment
+        context; its presence is the evidence that decisions are anchored to a
+        documented context rather than emitted contextless.
+
+    - id: map-2.3
+      title: "MAP 2.3 — AI system risk classification documented per decision"
+      requirement: >
+        Each agent decision records a risk classification together with a
+        reference to the rationale behind it, evidencing that scientific-integrity
+        and risk characterization of the system's behavior is documented.
+      citation:
+        instrument: "NIST AI RMF 1.0"
+        clause: "MAP 2.3"
+        url: "https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf"
+        quote: "Scientific integrity and TEVV considerations are identified and documented, including those related to experimental design, data collection and selection (e.g., availability, representativeness, suitability), system trustworthiness, and construct validation."
+        effective_date: "2023-01-26"
+        notes: >
+          Quote is the MAP 2.3 subcategory text from NIST AI 100-1 Appendix A;
+          the PDF has no per-subcategory anchor, so the URL is the official PDF.
+          The mapping interprets per-decision risk classification + rationale as
+          runtime evidence of documented risk characterization.
+      scope: { kind: ["agent_decision"] }
+      condition:
+        type: all_of
+        conditions:
+          - { type: field, path: "risk.classification", op: exists }
+          - { type: field, path: "risk.rationale_ref", op: exists }
+      empty_scope: insufficient_evidence
+
+    - id: measure-2.4
+      title: "MEASURE 2.4 — AI system functionality and behavior monitored in production"
+      requirement: >
+        Operational events from the deployed agent (model calls, tool calls,
+        decisions, oversight, risk, policy, incidents) are continuously recorded
+        in a tamper-evident log, providing the production monitoring substrate.
+      citation:
+        instrument: "NIST AI RMF 1.0"
+        clause: "MEASURE 2.4"
+        url: "https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf"
+        quote: "The functionality and behavior of the AI system and its components - as identified in the MAP function - are monitored when in production."
+        effective_date: "2023-01-26"
+        notes: >
+          Quote is the MEASURE 2.4 subcategory text from NIST AI 100-1 Appendix A;
+          the PDF has no per-subcategory anchor, so the URL is the official PDF.
+      scope:
+        kind: ["llm_call", "tool_call", "agent_decision", "human_approval", "risk_classification", "policy_decision", "incident"]
+      condition: { type: committed }
+      empty_scope: insufficient_evidence
+
+    - id: measure-2.8
+      title: "MEASURE 2.8 — Risks of transparency and accountability examined and documented"
+      requirement: >
+        Each agent decision records interpretable output evidence — a referenced
+        output, a documented risk rationale, or the responding model — supporting
+        traceability and accountability of what the system produced.
+      citation:
+        instrument: "NIST AI RMF 1.0"
+        clause: "MEASURE 2.8"
+        url: "https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf"
+        quote: "Risks associated with transparency and accountability - as identified in the MAP function - are examined and documented."
+        effective_date: "2023-01-26"
+        notes: >
+          Quote is the MEASURE 2.8 subcategory text from NIST AI 100-1 Appendix A;
+          the PDF has no per-subcategory anchor, so the URL is the official PDF.
+      scope: { kind: ["agent_decision"] }
+      condition:
+        type: any_of
+        conditions:
+          - { type: field, path: "io.output_ref", op: exists }
+          - { type: field, path: "risk.rationale_ref", op: exists }
+          - { type: field, path: "model.response_model", op: exists }
+      empty_scope: insufficient_evidence
+
+    - id: manage-4.1
+      title: "MANAGE 4.1 — Post-deployment monitoring incl. incident response/override"
+      requirement: >
+        Each recorded incident carries full task provenance back to its root task,
+        supporting the post-deployment monitoring, appeal/override and incident
+        response activities the MANAGE function requires.
+      citation:
+        instrument: "NIST AI RMF 1.0"
+        clause: "MANAGE 4.1"
+        url: "https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf"
+        quote: "Post-deployment AI system monitoring plans are implemented, including mechanisms for capturing and evaluating input from users and other relevant AI actors, appeal and override, decommissioning, incident response, recovery, and change management."
+        effective_date: "2023-01-26"
+        notes: >
+          Quote is the MANAGE 4.1 subcategory text from NIST AI 100-1 Appendix A;
+          the PDF has no per-subcategory anchor, so the URL is the official PDF.
+      scope: { kind: ["incident"] }
+      condition: { type: field, path: "provenance.root_task_id", op: exists }
+      empty_scope: insufficient_evidence

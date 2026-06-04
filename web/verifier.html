@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!--
+  OpenWright in-browser verifier (FR-VER-04 [P2]).
+  Runs the single-file, zero-dependency pure-Python verifier inside a stock WASM
+  Python (Pyodide) — no server, no network calls to a producer, no raw payloads.
+  Serve this directory (e.g. `python -m http.server`) and open verifier.html.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>OpenWright — in-browser verifier (WASM)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font: 14px/1.5 system-ui, sans-serif; max-width: 880px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.3rem; } textarea { width: 100%; box-sizing: border-box; font-family: monospace; }
+    .row { display: flex; gap: 1rem; } .row > div { flex: 1; }
+    button { padding: .6rem 1.2rem; font-size: 1rem; cursor: pointer; }
+    #out { white-space: pre-wrap; font-family: monospace; padding: 1rem; border-radius: 6px; background: #f5f5f5; margin-top: 1rem; }
+    .ok { color: #176d2c; } .bad { color: #b00020; }
+    .note { background: #fff3cd; border: 1px solid #ffc107; padding: .6rem; border-radius: 6px; font-size: .85rem; }
+  </style>
+</head>
+<body>
+  <h1>OpenWright — independent in-browser verifier</h1>
+  <p class="note">This verifier runs entirely in your browser via WebAssembly (Pyodide).
+  Your report and key are processed locally and <strong>never sent anywhere</strong> — it
+  never contacts the report producer or any OpenWright server. The one-time WebAssembly
+  runtime loads from a public CDN by default; for a fully offline / air-gapped verifier,
+  self-host Pyodide and append <code>?pyodide=&lt;your-base-url&gt;/</code> to this page's URL
+  (see <code>web/README.md</code>). It checks <em>evidence integrity</em> — it does
+  <strong>not</strong> assert legal compliance or certification.</p>
+  <div class="row">
+    <div><label>report.json<br/><textarea id="report" rows="12" placeholder="paste the signed report JSON"></textarea></label></div>
+    <div><label>signer public key (PEM)<br/><textarea id="pubkey" rows="12" placeholder="-----BEGIN PUBLIC KEY-----"></textarea></label></div>
+  </div>
+  <p><button id="go" disabled>Loading WASM runtime…</button></p>
+  <div id="out"></div>
+
+  <!-- Pyodide runtime base. Defaults to a public CDN; override with ?pyodide=<base>/
+       to load a self-hosted copy for fully offline/air-gapped verification. The
+       runtime is the ONLY network fetch; verification itself sends nothing. -->
+  <script>
+    window.__PYODIDE_BASE__ =
+      new URLSearchParams(location.search).get("pyodide") ||
+      "https://cdn.jsdelivr.net/pyodide/v0.26.2/full/";
+    document.write(
+      '<scr' + 'ipt src="' + window.__PYODIDE_BASE__ + 'pyodide.js"></scr' + 'ipt>'
+    );
+  </script>
+  <script>
+  async function main() {
+    const out = document.getElementById("out");
+    const btn = document.getElementById("go");
+    const pyodide = await loadPyodide({ indexURL: window.__PYODIDE_BASE__ });
+    // Load the single-file pure verifier (same directory).
+    const src = await (await fetch("openwright_verifier.py")).text();
+    pyodide.runPython(src);
+    const verify = pyodide.globals.get("verify_report");
+    const pubFromPem = pyodide.globals.get("pubkey_raw_from_pem");
+    btn.textContent = "Verify";
+    btn.disabled = false;
+    btn.onclick = () => {
+      try {
+        const report = pyodide.globals.get("json").loads(document.getElementById("report").value);
+        const pub = pubFromPem(document.getElementById("pubkey").value);
+        const res = verify(report, pub);            // (valid, checks)
+        const valid = res.get(0);
+        const checks = res.get(1);
+        let lines = [`VALID: ${valid}`];
+        for (let i = 0; i < checks.length; i++) {
+          const c = checks.get(i);
+          lines.push(`  [${c.get(1) ? "OK" : "FAIL"}] ${c.get(0)}`);
+        }
+        out.className = valid ? "ok" : "bad";
+        out.textContent = lines.join("\n");
+      } catch (e) {
+        out.className = "bad";
+        out.textContent = "error: " + e;
+      }
+    };
+  }
+  main();
+  </script>
+</body>
+</html>

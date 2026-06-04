@@ -1,0 +1,81 @@
+[project]
+name = "openwright-core"
+version = "0.7.1"
+description = "Agent Evidence Layer — turns AI-agent runtime behavior into signed, tamper-evident, control-mapped audit evidence."
+# Public PyPI long-description: a self-contained subset of README.md with the
+# internal-repo "Documentation" + "Project layout" sections removed (the source
+# repo is private). The full README.md stays the in-repo doc for org members.
+readme = "README.pypi.md"
+requires-python = ">=3.10,<3.15"
+license = { text = "Apache-2.0" }
+authors = [{ name = "OpenWright maintainers" }]
+keywords = [
+    "ai-agents", "compliance", "evidence", "audit", "eu-ai-act",
+    "opentelemetry", "a2a", "merkle", "transparency-log", "attestation",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+]
+
+# Core dependencies. The standalone verifier (openwright.verify) deliberately
+# imports ONLY `cryptography` + the standard library so it can be audited and
+# run in isolation (FR-VER-03). Everything else below supports producing
+# evidence; the verifier does not need it.
+dependencies = [
+    "pydantic>=2.7,<3",
+    "cryptography>=42",
+    "pyyaml>=6",
+    "jsonschema>=4.20",
+    "typer>=0.12",
+    "reportlab>=4.1",
+    # OTLP ingest + example agent (FR-ING-01/02/03, AC-01).
+    "opentelemetry-api>=1.27",
+    "opentelemetry-sdk>=1.27",
+    "opentelemetry-exporter-otlp-proto-http>=1.27",
+    "opentelemetry-proto>=1.27",
+    "protobuf>=4.25",
+    # gRPC ingest transport (FR-ING-01). Lazily imported so the rest of the
+    # system works even if the wheel is unavailable on a given platform.
+    "grpcio>=1.60",
+]
+
+[project.optional-dependencies]
+langgraph = ["langgraph>=0.2"]
+# Production storage/crypto backends. Each is lazily imported so the default
+# install — and especially the shallow verifier (INV-2) — never pulls them in.
+postgres = ["psycopg[binary]>=3.1"]
+s3 = ["boto3>=1.34"]
+hsm = ["python-pkcs11>=0.7"]
+
+[project.scripts]
+openwright = "openwright.cli:main"
+
+# [project.urls] intentionally omitted: the source repo is private, so public
+# Homepage/Documentation links would 404 on PyPI. Restore when a public site exists.
+
+[tool.poetry]
+packages = [
+    { include = "openwright", from = "src" },
+]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2"
+pytest-timeout = "^2.3"
+# Backend tests (V2/V3/V4) run against real/emulated services when present and
+# skip cleanly otherwise, so the default suite needs no infrastructure.
+psycopg = { version = "^3.1", extras = ["binary"] }
+boto3 = "^1.34"
+moto = { version = "^5.0", extras = ["s3", "kms"] }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+timeout = 120
+
+[build-system]
+requires = ["poetry-core>=2.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+dist/
+build/
+
+# OpenWright generated artifacts
+openwright-demo/
+openwright-ledger/
+openwright-out/
+quickstart-ledger/
+ledger/
+*.pem
+*.pem.pub
+!schemas/**
+
+# Local Claude Code agent config/state (never committed)
+.claude/
+
+# Internal advisor/ground-truth dumps — not part of the published repo
+ADVISOR_*.md
+
+# Node modules anywhere (npm install to restore)
+node_modules/
+
+# Downloaded OTel Collector binary (examples/otel_collector)
+.otelcol_tmp/
+
+# OS
+.DS_Store
+
+# Local Go toolchain (Option B/C build)
+.gotool/
+otel/_build/
+
+# WASM verifier test: large Pyodide runtime + generated fixtures (npm install to restore)
+web/wasm_test/node_modules/
+web/wasm_test/fixtures/
+web/wasm_test/package-lock.json
+
+# npm package build artifacts (npm install / pack to restore)
+packages/npm/openwright/node_modules/
+packages/npm/openwright/fixtures/
+packages/npm/openwright/*.tgz
+packages/npm/openwright/package-lock.json
+
+# Stray venv created by a copy-pasted `python -m venv path/to/venv`
+path/to/

@@ -1,0 +1,8 @@
+{
+  "name": "openwright-wasm-verifier-test",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Automated Pyodide (WASM CPython) end-to-end test of the single-file OpenWright verifier (B10/V5).",
+  "dependencies": { "pyodide": "0.26.2" }
+}

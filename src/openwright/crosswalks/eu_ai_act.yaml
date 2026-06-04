@@ -1,0 +1,294 @@
+# EU AI Act control crosswalk for OpenWright.
+#
+# This crosswalk maps OpenWright canonical events to obligations in Regulation
+# (EU) 2024/1689 (the "EU AI Act"). It is maintainer-authored and rigorously
+# cited, but it is NOT a legal interpretation and carries no normative authority
+# (C-03, A-05, R-01). Each control records the primary-source article it derives
+# from and the date the text was reviewed (NFR-MNT-02).
+#
+# TIMELINE (reviewed 2026-06-01): the Annex III standalone high-risk obligations
+# in Chapter III (Articles 8-17, 26, 27) apply from 2 December 2027 following the
+# "Digital Omnibus" deferral from the original 2 August 2026 date (U9). Near-term
+# dates that are NOT deferred and that map to OpenWright evidence: Article 50
+# (transparency obligations for certain AI systems) and Article 6(3)/registration
+# duties. Re-verify against the Official Journal before relying on any date.
+#
+# REVIEW STATUS: this crosswalk is maintainer-authored and primary-source cited.
+# The U12 predicate reframes below (Art-12 collection-vs-retention circularity,
+# Art-13 thin runtime proxy, Art-14 in/on-the-loop split, Art-27 FRIA gating,
+# Art-26/73 substance) are STRUCTURAL and remain pending a named specialist
+# verdict (V16) before any control is presented as review-defensible.
+
+crosswalk:
+  id: eu-ai-act
+  title: "EU AI Act — Regulation (EU) 2024/1689 (high-risk obligations subset)"
+  version: "1.1.0"
+  source: "Regulation (EU) 2024/1689 (OJ L, 2024/1689, 12.7.2024)"
+  reviewed_as_of: "2026-06-01"
+  # Deployer-profile defaults (B14): the unprofiled crosswalk uses the in-the-loop
+  # Art-14 variant and includes the FRIA-applicable Art-27 (the historical set).
+  # Select ["on_the_loop"] for monitoring-style oversight, and drop "fria_applicable"
+  # for deployers outside Art-27's scope.
+  default_profiles: ["in_the_loop", "fria_applicable"]
+  description: >
+    Maps runtime agent evidence to a subset of EU AI Act high-risk obligations:
+    Article 12 (record-keeping), Article 13 (transparency), Article 14 (human
+    oversight — in-the-loop and on-the-loop variants), Article 26 (deployer
+    obligations), Article 27 (fundamental-rights impact assessment, gated to
+    FRIA-applicable deployers), and Article 73 (serious-incident reporting).
+    Covers the minimum required by FR-MAP-02. Art-14/Art-27 are selectable by
+    deployer profile (B14); see default_profiles.
+  disclaimer: >
+    This crosswalk produces EVIDENCE that specific controls were exercised at
+    runtime. It does NOT constitute legal compliance, certification, conformity
+    assessment, or an audit opinion under the EU AI Act. Those determinations are
+    reserved for qualified auditors, notified bodies, and counsel.
+
+  controls:
+    - id: art-12-record-keeping
+      title: "Article 12 — Record-keeping (automatic event logging; collection side)"
+      requirement: >
+        Operational events produced by the high-risk AI system are automatically
+        recorded in an append-only, tamper-evident log with integrity proofs. This
+        control evidences the *collection/recording* limb of Article 12; the
+        *retention* duty (keeping logs for at least six months) is a deployer
+        obligation evidenced separately under Article 26(6) (art-26-deployer-obligations).
+      citation:
+        instrument: "Regulation (EU) 2024/1689"
+        article: "12"
+        paragraphs: ["1", "2"]
+        url: "https://artificialintelligenceact.eu/article/12/"
+        quote: >
+          High-risk AI systems shall technically allow for the automatic recording
+          of events (logs) over the lifetime of the system.
+        effective_date: "2027-12-02"
+        notes: >
+          U12 reframe: scoped to automatic recording/collection; retention moved to
+          Art-26(6) to resolve the circularity below. Pending specialist verdict (V16).
+      scope:
+        kind: ["llm_call", "tool_call", "agent_decision", "human_approval", "risk_classification", "policy_decision", "incident"]
+      condition:
+        type: committed
+      empty_scope: insufficient_evidence
+      # Record-keeping is a *completeness* obligation: a self-attested evidence_gap
+      # marker (dropped/lost spans) means the automatic recording was not complete,
+      # so the control cannot be satisfied while a gap is attested (U1, V8).
+      completeness_sensitive: true
+      rationale: >
+        U12 circularity note: "an event is in the log, therefore it was recorded"
+        is self-referential on its own. Two things make it non-vacuous: (1) the log
+        self-attests its own gaps, so an attested evidence_gap downgrades this
+        control to not_satisfied (completeness_sensitive) rather than passing
+        silently; and (2) the substantive *retention* commitment is evidenced
+        separately and durably under Art-26(6). Treat this control as evidence the
+        recording mechanism operated completely, not as proof of full Art-12
+        compliance.
+
+    - id: art-13-transparency
+      title: "Article 13 — Transparency (runtime interpretability proxy — CAVEATED)"
+      requirement: >
+        Each agent decision and model call records interpretable output evidence —
+        a referenced output, the responding model, or a finish reason — so a
+        deployer can interpret what the system produced (without raw content
+        needing to be retained). NOTE (U12): Article 13 is primarily a *design and
+        documentation* obligation (instructions for use, intended purpose, accuracy
+        and limitations). This runtime predicate is a THIN PROXY — it shows that
+        interpretable signals were captured per operation, not that the system's
+        design/documentation satisfies Art-13. Read it as supporting evidence only.
+      citation:
+        instrument: "Regulation (EU) 2024/1689"
+        article: "13"
+        paragraphs: ["1"]
+        url: "https://artificialintelligenceact.eu/article/13/"
+        quote: >
+          High-risk AI systems shall be designed and developed in such a way as to
+          ensure that their operation is sufficiently transparent to enable
+          deployers to interpret a system's output and use it appropriately.
+        effective_date: "2027-12-02"
+        notes: >
+          U12: design+docs obligation; runtime evidence is a thin proxy. A specialist
+          may narrow, caveat, or cut this control (V16).
+      scope:
+        kind: ["agent_decision", "llm_call"]
+      condition:
+        type: any_of
+        conditions:
+          - { type: field, path: "io.output_ref", op: exists }
+          - { type: field, path: "model.response_model", op: exists }
+          - { type: field, path: "attributes.finish_reasons", op: exists }
+      empty_scope: insufficient_evidence
+      rationale: >
+        Transparency under Art-13 is satisfied chiefly by instructions-for-use and
+        technical documentation, which are outside runtime telemetry. OpenWright can
+        only attest that interpretable runtime signals were recorded; it does not
+        and cannot attest the documentation limb.
+
+    - id: art-14-human-oversight
+      title: "Article 14 — Human oversight (IN-THE-LOOP: per-decision approval)"
+      variant: in_the_loop
+      applies_to_profiles: ["in_the_loop"]
+      requirement: >
+        IN-THE-LOOP variant: every high-risk agent decision is linked to a recorded
+        human-approval event whose oversight status is 'approved' — i.e. a human
+        approved each decision before it took effect. Select this variant for
+        deployers operating with per-decision sign-off.
+      citation:
+        instrument: "Regulation (EU) 2024/1689"
+        article: "14"
+        paragraphs: ["1", "4"]
+        url: "https://artificialintelligenceact.eu/article/14/"
+        quote: >
+          High-risk AI systems shall be designed and developed in such a way ...
+          that they can be effectively overseen by natural persons during the
+          period in which they are in use.
+        effective_date: "2027-12-02"
+        notes: "U12: Art-14 split into in-the-loop/on-the-loop variants (B14). Pending V16."
+      scope:
+        kind: ["agent_decision"]
+        risk_classification: ["high"]
+      condition:
+        type: linked
+        link: approval_ref
+        target:
+          kind: ["human_approval"]
+          oversight_status: ["approved"]
+      empty_scope: insufficient_evidence
+
+    - id: art-14-human-oversight-on-the-loop
+      title: "Article 14 — Human oversight (ON-THE-LOOP: monitoring + intervention capability)"
+      variant: on_the_loop
+      applies_to_profiles: ["on_the_loop"]
+      requirement: >
+        ON-THE-LOOP variant: high-risk decisions need not be individually approved,
+        but each must operate within a session that has a recorded human-oversight
+        touchpoint — a human_approval or a policy_decision in the same task context
+        — evidencing that a natural person could monitor and intervene. Select this
+        variant for deployers operating supervisory (not per-decision) oversight.
+      citation:
+        instrument: "Regulation (EU) 2024/1689"
+        article: "14"
+        paragraphs: ["1", "4"]
+        url: "https://artificialintelligenceact.eu/article/14/"
+        quote: >
+          High-risk AI systems shall be designed and developed in such a way ...
+          that they can be effectively overseen by natural persons during the
+          period in which they are in use.
+        effective_date: "2027-12-02"
+        notes: >
+          U12: on-the-loop oversight evidences a monitoring/intervention capability
+          present in the session rather than per-decision approval. Pending V16.
+      scope:
+        kind: ["agent_decision"]
+        risk_classification: ["high"]
+      condition:
+        type: linked
+        link: same_context
+        target:
+          kind: ["human_approval", "policy_decision"]
+      empty_scope: insufficient_evidence
+      rationale: >
+        On-the-loop oversight is supervisory: the deployer monitors and can
+        intervene/halt. The evidence is the presence of an oversight touchpoint in
+        the decision's task context, not a per-decision approval link.
+
+    - id: art-26-deployer-obligations
+      title: "Article 26 — Deployer obligations (documented risk basis + ≥6-month log retention)"
+      requirement: >
+        Each high-risk decision carries a documented risk-classification rationale
+        AND an attested retention commitment, the substantive Art-26(6) bar being a
+        retention window of at least six months. OpenWright attests the retention
+        commitment cryptographically (it is part of the signed leaf), which is
+        stronger than "a field was populated".
+      citation:
+        instrument: "Regulation (EU) 2024/1689"
+        article: "26"
+        paragraphs: ["1", "6"]
+        url: "https://artificialintelligenceact.eu/article/26/"
+        quote: >
+          Deployers shall keep the logs automatically generated by that high-risk
+          AI system ... for a period appropriate to the intended purpose of the
+          high-risk AI system, of at least six months.
+        effective_date: "2027-12-02"
+        notes: >
+          U12 substance: the ≥6-month floor is the real bar. Verifying the *duration*
+          (retention_until - committed_at >= 6 months) needs a date-difference
+          predicate op the engine does not yet expose; today the control attests that
+          a retention commitment exists and is signed. Strengthening the duration
+          check and the specialist verdict are pending (V16).
+      scope:
+        kind: ["agent_decision"]
+        risk_classification: ["high"]
+      condition:
+        type: all_of
+        conditions:
+          - { type: field, path: "risk.rationale_ref", op: exists }
+          - { type: field, path: "ledger.retention_until", op: exists }
+      empty_scope: insufficient_evidence
+
+    - id: art-27-fria
+      title: "Article 27 — Fundamental-rights impact assessment (FRIA — gated to FRIA-applicable deployers)"
+      applies_to_profiles: ["fria_applicable"]
+      requirement: >
+        FRIA-APPLICABLE deployers only: each high-risk decision shares a task context
+        with a recorded risk-classification event that references a fundamental-rights
+        impact assessment (FRIA). This control is GATED (B14) — it is included only
+        for deployers within Art-27's scope (public bodies, providers of public
+        services, and deployers of Annex III 5(b)/(c) credit & insurance systems);
+        for other deployers Art-27 does not apply and the control is omitted rather
+        than reported as a gap.
+      citation:
+        instrument: "Regulation (EU) 2024/1689"
+        article: "27"
+        paragraphs: ["1"]
+        url: "https://artificialintelligenceact.eu/article/27/"
+        quote: >
+          Deployers ... shall perform an assessment of the impact on fundamental
+          rights that the use of such system may produce.
+        effective_date: "2027-12-02"
+        notes: >
+          U12: gated to FRIA-applicable deployer profiles (select "fria_applicable").
+          FRIA applies to specific deployers (public bodies, providers of public
+          services, and deployers of Annex III 5(b)/(c) credit & insurance systems).
+          Pending specialist verdict (V16).
+      scope:
+        kind: ["agent_decision"]
+        risk_classification: ["high"]
+      condition:
+        type: linked
+        link: same_context
+        target:
+          kind: ["risk_classification"]
+          has: ["attributes.fria_ref"]
+      empty_scope: insufficient_evidence
+
+    - id: art-73-serious-incident
+      title: "Article 73 — Serious-incident reporting (traceable incident + applicable deadline)"
+      requirement: >
+        Every recorded serious incident is traceable to its originating run (full
+        task provenance back to the root task) AND records the reporting-deadline
+        window that applies to its severity (15 days standard; 10 days where a death
+        is involved; 2 days for widespread infringements or critical-infrastructure
+        disruption). The provenance link is what makes an incident investigable, not
+        merely logged.
+      citation:
+        instrument: "Regulation (EU) 2024/1689"
+        article: "73"
+        paragraphs: ["2", "3", "4"]
+        url: "https://artificialintelligenceact.eu/article/73/"
+        quote: >
+          ... not later than 15 days after the provider or, where applicable, the
+          deployer, becomes aware of the serious incident.
+        effective_date: "2027-12-02"
+        notes: >
+          U12 substance: strengthened from "a deadline field exists" toward the
+          deadline matching the incident severity and the incident being traceable
+          to its run. Verifying severity->deadline correspondence is a predicate
+          enhancement pending the engine + specialist verdict (V16).
+      scope:
+        kind: ["incident"]
+      condition:
+        type: all_of
+        conditions:
+          - { type: field, path: "provenance.root_task_id", op: exists }
+          - { type: field, path: "attributes.report_deadline_days", op: exists }
+      empty_scope: insufficient_evidence

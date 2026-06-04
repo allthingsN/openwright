@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.openwright.dev/report/1.0.0",
+  "title": "OpenWright Report",
+  "type": "object",
+  "required": [
+    "report_version",
+    "report_id",
+    "generated_at",
+    "tool",
+    "boundary_statement",
+    "scope",
+    "crosswalk",
+    "summary",
+    "controls",
+    "checkpoint",
+    "events",
+    "public_key_pem",
+    "signature"
+  ],
+  "properties": {
+    "report_version": {
+      "type": "string"
+    },
+    "report_id": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "tool": {
+      "type": "object",
+      "required": [
+        "name",
+        "version"
+      ]
+    },
+    "boundary_statement": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "description",
+        "agent_ids"
+      ],
+      "properties": {
+        "agent_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "period": {
+      "type": "object"
+    },
+    "crosswalk": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "content_hash"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total",
+        "satisfied",
+        "not_satisfied",
+        "insufficient_evidence"
+      ]
+    },
+    "controls": {
+      "type": "array"
+    },
+    "evidence_gaps": {
+      "type": "array"
+    },
+    "checkpoint": {
+      "type": "object",
+      "required": [
+        "origin",
+        "tree_size",
+        "root_hash",
+        "timestamp",
+        "public_key_id",
+        "signature"
+      ]
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "event",
+          "leaf_index",
+          "inclusion_proof"
+        ],
+        "properties": {
+          "event": {
+            "type": "object"
+          },
+          "leaf_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "inclusion_proof": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "public_key_pem": {
+      "type": "string"
+    },
+    "signature": {
+      "type": "object",
+      "required": [
+        "algorithm",
+        "public_key_id",
+        "signature"
+      ]
+    }
+  }
+}

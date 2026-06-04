@@ -1,0 +1,40 @@
+# OpenWright — zero-code fan-out for an existing OpenTelemetry Collector
+#
+# Drop OpenWright into a Collector you already run. The ONLY change is adding one
+# exporter (`otlphttp/openwright`) to your existing traces pipeline. Your real
+# backend keeps receiving telemetry unchanged; the Collector natively fans out
+# to every exporter in the pipeline, so the evidence fork is strictly additive —
+# a failing OpenWright sink degrades only the evidence copy, never your telemetry.
+#
+# Run the OpenWright sink as a pure evidence receiver (no downstream forwarding):
+#
+#     openwright collector --ledger-dir ./openwright-ledger        # serves OTLP/HTTP on :4318
+#
+# Then point this exporter at it. (otlphttp appends /v1/traces to `endpoint`.)
+
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+exporters:
+  # >>> YOUR EXISTING BACKEND — leave exactly as you have it today.
+  otlphttp/backend:
+    endpoint: https://your-langfuse-or-phoenix-or-datadog-endpoint
+
+  # >>> THE ONE ADDITION: fork a copy of the telemetry to OpenWright.
+  otlphttp/openwright:
+    endpoint: http://127.0.0.1:4318   # where `openwright collector` is listening
+    compression: none                 # the reference sink expects uncompressed OTLP
+    tls:
+      insecure: true                  # local sink over http; use real TLS in prod
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      # Add `otlphttp/openwright` alongside your existing exporter(s).
+      exporters: [otlphttp/backend, otlphttp/openwright]

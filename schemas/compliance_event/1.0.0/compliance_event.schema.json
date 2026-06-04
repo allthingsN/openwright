@@ -1,0 +1,681 @@
+{
+  "$defs": {
+    "Actor": {
+      "additionalProperties": true,
+      "properties": {
+        "agent_id": {
+          "title": "Agent Id",
+          "type": "string"
+        },
+        "agent_card_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agent Card Ref"
+        },
+        "identity_claim": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IdentityClaim"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "agent_id"
+      ],
+      "title": "Actor",
+      "type": "object"
+    },
+    "EventKind": {
+      "description": "The category of an evidence event.",
+      "enum": [
+        "llm_call",
+        "tool_call",
+        "agent_decision",
+        "human_approval",
+        "risk_classification",
+        "policy_decision",
+        "incident",
+        "conformance_finding",
+        "identity_claim",
+        "task_status",
+        "correction",
+        "generic"
+      ],
+      "title": "EventKind",
+      "type": "string"
+    },
+    "IORef": {
+      "additionalProperties": true,
+      "description": "References to I/O \u2014 never raw payloads (DR-02). Costs are decimal strings.",
+      "properties": {
+        "input_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Ref"
+        },
+        "output_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Ref"
+        },
+        "arguments_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Arguments Ref"
+        },
+        "input_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Tokens"
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Tokens"
+        },
+        "total_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Tokens"
+        },
+        "cost": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost"
+        },
+        "cost_currency": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost Currency"
+        }
+      },
+      "title": "IORef",
+      "type": "object"
+    },
+    "IdentityClaim": {
+      "additionalProperties": true,
+      "description": "A cryptographic binding of an event to an agent's A2A AgentCard.\n\nAddresses the gap (FR-ATT-07) that AgentCard fields are descriptive but not\ncryptographically bound: the claim signs a hash of the AgentCard with a key\nthe agent controls, so a verifier can confirm the asserted identity.",
+      "properties": {
+        "claim_type": {
+          "default": "agentcard-binding",
+          "title": "Claim Type",
+          "type": "string"
+        },
+        "public_key_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Public Key Id"
+        },
+        "agent_card_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agent Card Hash"
+        },
+        "signature_b64": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Signature B64"
+        }
+      },
+      "title": "IdentityClaim",
+      "type": "object"
+    },
+    "LedgerFields": {
+      "additionalProperties": true,
+      "description": "Assigned at commit time; excluded from id/leaf derivation.",
+      "properties": {
+        "leaf_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Leaf Hash"
+        },
+        "leaf_index": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Leaf Index"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "committed_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Committed At"
+        },
+        "retention_until": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retention Until"
+        }
+      },
+      "title": "LedgerFields",
+      "type": "object"
+    },
+    "ModelInfo": {
+      "additionalProperties": true,
+      "properties": {
+        "provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider"
+        },
+        "request_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Model"
+        },
+        "response_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Response Model"
+        }
+      },
+      "title": "ModelInfo",
+      "type": "object"
+    },
+    "Oversight": {
+      "additionalProperties": true,
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/OversightStatus",
+          "default": "unknown"
+        },
+        "approval_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Approval Ref"
+        },
+        "reviewer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewer"
+        }
+      },
+      "title": "Oversight",
+      "type": "object"
+    },
+    "OversightStatus": {
+      "description": "Human-oversight state for an event (EU AI Act Art. 14).",
+      "enum": [
+        "not_required",
+        "pending",
+        "approved",
+        "rejected",
+        "unknown"
+      ],
+      "title": "OversightStatus",
+      "type": "string"
+    },
+    "Provenance": {
+      "additionalProperties": true,
+      "description": "A2A task provenance (FR-ING-05). Absent A2A, degrades to single events.",
+      "properties": {
+        "task_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Id"
+        },
+        "context_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Context Id"
+        },
+        "parent_task_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Task Id"
+        },
+        "root_task_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Root Task Id"
+        }
+      },
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Risk": {
+      "additionalProperties": true,
+      "properties": {
+        "classification": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Classification"
+        },
+        "rationale_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rationale Ref"
+        },
+        "framework": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Framework"
+        }
+      },
+      "title": "Risk",
+      "type": "object"
+    },
+    "SourceMeta": {
+      "additionalProperties": true,
+      "properties": {
+        "format": {
+          "title": "Format",
+          "type": "string"
+        },
+        "span_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Span Id"
+        },
+        "trace_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trace Id"
+        },
+        "collector_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Collector Version"
+        },
+        "ingested_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ingested At"
+        }
+      },
+      "required": [
+        "format"
+      ],
+      "title": "SourceMeta",
+      "type": "object"
+    },
+    "ToolInfo": {
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name"
+        },
+        "call_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Call Id"
+        }
+      },
+      "title": "ToolInfo",
+      "type": "object"
+    }
+  },
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": {
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "event_id": {
+      "default": "",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/EventKind"
+    },
+    "actor": {
+      "$ref": "#/$defs/Actor"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "io": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IORef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "model": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ModelInfo"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "tool": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ToolInfo"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "oversight": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Oversight"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "risk": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Risk"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "attributes": {
+      "additionalProperties": true,
+      "title": "Attributes",
+      "type": "object"
+    },
+    "labels": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Labels",
+      "type": "object"
+    },
+    "source": {
+      "$ref": "#/$defs/SourceMeta"
+    },
+    "ledger": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LedgerFields"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "timestamp",
+    "kind",
+    "actor",
+    "source"
+  ],
+  "title": "OpenWright ComplianceEvent",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.openwright.dev/compliance_event/1.0.0",
+  "x-openwright-schema-version": "1.0.0"
+}

@@ -1,0 +1,775 @@
+{
+  "_comment": "Shared Python<->Go conformance vectors. Source of truth: the Python core. Regenerate with conformance/generate_vectors.py.",
+  "canonical": [
+    {
+      "input": {
+        "b": 1,
+        "a": 2,
+        "c": 3
+      },
+      "canonical": "{\"a\":2,\"b\":1,\"c\":3}",
+      "leaf_hash": "8c51007126c4356ab3862d3dbe92e258d2764623d38fc24e3c53edfe6325434c"
+    },
+    {
+      "input": {
+        "z": {
+          "y": 1,
+          "x": 2
+        },
+        "a": [
+          3,
+          2,
+          1
+        ]
+      },
+      "canonical": "{\"a\":[3,2,1],\"z\":{\"x\":2,\"y\":1}}",
+      "leaf_hash": "ad22352b7913f825fc594faa932f26a5fdff487c064e4ef3b0cebc5ad1db47e9"
+    },
+    {
+      "input": {
+        "keep": 1,
+        "drop": null,
+        "nested": {
+          "x": null,
+          "y": 5
+        }
+      },
+      "canonical": "{\"keep\":1,\"nested\":{\"y\":5}}",
+      "leaf_hash": "fd309ee99f675e0b77640ec0925c577cda4545e0299783ab0cd580790b88685f"
+    },
+    {
+      "input": {
+        "unicode": "café — naïve ☕",
+        "emoji": "🔐"
+      },
+      "canonical": "{\"emoji\":\"🔐\",\"unicode\":\"café — naïve ☕\"}",
+      "leaf_hash": "faca9900493355220fa579df70a0a1f1c885a9798b05c66d525a239e882f775c"
+    },
+    {
+      "input": {
+        "escapes": "quote\" back\\slash tab\there newline\nhere"
+      },
+      "canonical": "{\"escapes\":\"quote\\\" back\\\\slash tab\\there newline\\nhere\"}",
+      "leaf_hash": "d88091ac6f0dd238304dd07211fd8d620d0053f236669bc5c4590d3e97ecdc26"
+    },
+    {
+      "input": {
+        "controls": "bell\u0007 bs\b ff\f cr\r unit\u0001"
+      },
+      "canonical": "{\"controls\":\"bell\\u0007 bs\\b ff\\f cr\\r unit\\u0001\"}",
+      "leaf_hash": "773e740557f0ab29d93e0cffcbb19a35cdd7130d3789496e7e394a6c7e6b11ca"
+    },
+    {
+      "input": {
+        "html": "a<b>c&d",
+        "slashes": "a/b"
+      },
+      "canonical": "{\"html\":\"a<b>c&d\",\"slashes\":\"a/b\"}",
+      "leaf_hash": "b771f134589d16cb22d66a51de03026c222670c9181ef103ba45ba2c76200950"
+    },
+    {
+      "input": {
+        "ints": [
+          0,
+          -1,
+          42,
+          1234567890123456789
+        ],
+        "bools": [
+          true,
+          false
+        ]
+      },
+      "canonical": "{\"bools\":[true,false],\"ints\":[0,-1,42,1234567890123456789]}",
+      "leaf_hash": "9b0f8d39b7e810b4a5b10e433762bb36062281e005dae6f78cd5f77018607445"
+    },
+    {
+      "input": [],
+      "canonical": "[]",
+      "leaf_hash": "f370acc9d8b734d907d177ef29f70d4102a6226a969871eef36ce547b2944361"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "leaf_hash": "28a3a18f6cd6406b086e9ffda1f9b8a13dbcf44b0f3f32cb9031a11fd053acf9"
+    },
+    {
+      "input": "a bare string with ünïcödé",
+      "canonical": "\"a bare string with ünïcödé\"",
+      "leaf_hash": "aabf07a0d7cb5a72091debc88aad5f2a40ebac6af57328b1303c2c0e5a1ddbed"
+    },
+    {
+      "input": 1234567890,
+      "canonical": "1234567890",
+      "leaf_hash": "518ded7b0703b883e886ce1adea7f893c9798aa36c289b0557d1ad53da9ebd27"
+    }
+  ],
+  "merkle": [
+    {
+      "leaves": [],
+      "root": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "inclusion": []
+    },
+    {
+      "leaves": [
+        "leaf-0"
+      ],
+      "root": "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+      "inclusion": [
+        {
+          "index": 0,
+          "proof": []
+        }
+      ]
+    },
+    {
+      "leaves": [
+        "leaf-0",
+        "leaf-1"
+      ],
+      "root": "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+      "inclusion": [
+        {
+          "index": 0,
+          "proof": [
+            "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f"
+          ]
+        },
+        {
+          "index": 1,
+          "proof": [
+            "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7"
+          ]
+        }
+      ]
+    },
+    {
+      "leaves": [
+        "leaf-0",
+        "leaf-1",
+        "leaf-2"
+      ],
+      "root": "cf763a041c81ceef1578a6083f75c61bef2e0014f2a3e683a97fcfca5be7f19a",
+      "inclusion": [
+        {
+          "index": 0,
+          "proof": [
+            "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+            "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267"
+          ]
+        },
+        {
+          "index": 1,
+          "proof": [
+            "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+            "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267"
+          ]
+        },
+        {
+          "index": 2,
+          "proof": [
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc"
+          ]
+        }
+      ]
+    },
+    {
+      "leaves": [
+        "leaf-0",
+        "leaf-1",
+        "leaf-2",
+        "leaf-3"
+      ],
+      "root": "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3",
+      "inclusion": [
+        {
+          "index": 0,
+          "proof": [
+            "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69"
+          ]
+        },
+        {
+          "index": 1,
+          "proof": [
+            "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69"
+          ]
+        },
+        {
+          "index": 2,
+          "proof": [
+            "f76836325aec5699d8d71f8e42e9d47c5c29b08059ba296384f7ca40ad3a40ae",
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc"
+          ]
+        },
+        {
+          "index": 3,
+          "proof": [
+            "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267",
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc"
+          ]
+        }
+      ]
+    },
+    {
+      "leaves": [
+        "leaf-0",
+        "leaf-1",
+        "leaf-2",
+        "leaf-3",
+        "leaf-4"
+      ],
+      "root": "00d21829a5503145348abcf712513eacf2a274211ad83e970202bb5b6d80b286",
+      "inclusion": [
+        {
+          "index": 0,
+          "proof": [
+            "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+            "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba"
+          ]
+        },
+        {
+          "index": 1,
+          "proof": [
+            "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+            "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba"
+          ]
+        },
+        {
+          "index": 2,
+          "proof": [
+            "f76836325aec5699d8d71f8e42e9d47c5c29b08059ba296384f7ca40ad3a40ae",
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+            "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba"
+          ]
+        },
+        {
+          "index": 3,
+          "proof": [
+            "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267",
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+            "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba"
+          ]
+        },
+        {
+          "index": 4,
+          "proof": [
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3"
+          ]
+        }
+      ]
+    },
+    {
+      "leaves": [
+        "leaf-0",
+        "leaf-1",
+        "leaf-2",
+        "leaf-3",
+        "leaf-4",
+        "leaf-5",
+        "leaf-6"
+      ],
+      "root": "0b007fb915eb9b2a146f54b1c86ec53b664f8e455b7660b0b6ee13edc0d921c0",
+      "inclusion": [
+        {
+          "index": 0,
+          "proof": [
+            "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+            "8eae6bd3b3a07f1f75ee72a531629e6eb31e42e62f760e47de52a53c3641ef23"
+          ]
+        },
+        {
+          "index": 1,
+          "proof": [
+            "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+            "8eae6bd3b3a07f1f75ee72a531629e6eb31e42e62f760e47de52a53c3641ef23"
+          ]
+        },
+        {
+          "index": 2,
+          "proof": [
+            "f76836325aec5699d8d71f8e42e9d47c5c29b08059ba296384f7ca40ad3a40ae",
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+            "8eae6bd3b3a07f1f75ee72a531629e6eb31e42e62f760e47de52a53c3641ef23"
+          ]
+        },
+        {
+          "index": 3,
+          "proof": [
+            "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267",
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+            "8eae6bd3b3a07f1f75ee72a531629e6eb31e42e62f760e47de52a53c3641ef23"
+          ]
+        },
+        {
+          "index": 4,
+          "proof": [
+            "8f1593cb92f429d9340b9bbc1f0bb122adf8026c42a4a42142e2168931727236",
+            "676f3782f5b3a5fb4370ed49572cedc523f4a66322269c85f2af0509d17b0a4d",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3"
+          ]
+        },
+        {
+          "index": 5,
+          "proof": [
+            "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba",
+            "676f3782f5b3a5fb4370ed49572cedc523f4a66322269c85f2af0509d17b0a4d",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3"
+          ]
+        },
+        {
+          "index": 6,
+          "proof": [
+            "985bb5d36b927800876871da925a7e82abe83a9ddba5882920a007a55ea2b376",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3"
+          ]
+        }
+      ]
+    },
+    {
+      "leaves": [
+        "leaf-0",
+        "leaf-1",
+        "leaf-2",
+        "leaf-3",
+        "leaf-4",
+        "leaf-5",
+        "leaf-6",
+        "leaf-7"
+      ],
+      "root": "ca6b7b3e674ac86c1027b59c87c064fc3bc27b313294c75f83bd05fdd13f0dcf",
+      "inclusion": [
+        {
+          "index": 0,
+          "proof": [
+            "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a"
+          ]
+        },
+        {
+          "index": 1,
+          "proof": [
+            "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a"
+          ]
+        },
+        {
+          "index": 2,
+          "proof": [
+            "f76836325aec5699d8d71f8e42e9d47c5c29b08059ba296384f7ca40ad3a40ae",
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a"
+          ]
+        },
+        {
+          "index": 3,
+          "proof": [
+            "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267",
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a"
+          ]
+        },
+        {
+          "index": 4,
+          "proof": [
+            "8f1593cb92f429d9340b9bbc1f0bb122adf8026c42a4a42142e2168931727236",
+            "398ebdeb46e179eeffacef4635fd30410954e169b88e22741fa96cffb1022a85",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3"
+          ]
+        },
+        {
+          "index": 5,
+          "proof": [
+            "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba",
+            "398ebdeb46e179eeffacef4635fd30410954e169b88e22741fa96cffb1022a85",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3"
+          ]
+        },
+        {
+          "index": 6,
+          "proof": [
+            "060242692909024231d050c5d4434146ba77da322d450286f577c9f951615d53",
+            "985bb5d36b927800876871da925a7e82abe83a9ddba5882920a007a55ea2b376",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3"
+          ]
+        },
+        {
+          "index": 7,
+          "proof": [
+            "676f3782f5b3a5fb4370ed49572cedc523f4a66322269c85f2af0509d17b0a4d",
+            "985bb5d36b927800876871da925a7e82abe83a9ddba5882920a007a55ea2b376",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3"
+          ]
+        }
+      ]
+    },
+    {
+      "leaves": [
+        "leaf-0",
+        "leaf-1",
+        "leaf-2",
+        "leaf-3",
+        "leaf-4",
+        "leaf-5",
+        "leaf-6",
+        "leaf-7",
+        "leaf-8",
+        "leaf-9",
+        "leaf-10"
+      ],
+      "root": "1db5226a80052816fa403f39e329ed282432541d670d8a2f2708ee86a7df10d4",
+      "inclusion": [
+        {
+          "index": 0,
+          "proof": [
+            "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a",
+            "c810fa418bacbfb4dd4775ada97cc9ac535e7a812f06e9df7287e39276ec7090"
+          ]
+        },
+        {
+          "index": 1,
+          "proof": [
+            "305df59f9590c3c9ac63d2b2743c388e3792449078cebf7fb3dbe6471643b2b7",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a",
+            "c810fa418bacbfb4dd4775ada97cc9ac535e7a812f06e9df7287e39276ec7090"
+          ]
+        },
+        {
+          "index": 2,
+          "proof": [
+            "f76836325aec5699d8d71f8e42e9d47c5c29b08059ba296384f7ca40ad3a40ae",
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a",
+            "c810fa418bacbfb4dd4775ada97cc9ac535e7a812f06e9df7287e39276ec7090"
+          ]
+        },
+        {
+          "index": 3,
+          "proof": [
+            "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267",
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a",
+            "c810fa418bacbfb4dd4775ada97cc9ac535e7a812f06e9df7287e39276ec7090"
+          ]
+        },
+        {
+          "index": 4,
+          "proof": [
+            "8f1593cb92f429d9340b9bbc1f0bb122adf8026c42a4a42142e2168931727236",
+            "398ebdeb46e179eeffacef4635fd30410954e169b88e22741fa96cffb1022a85",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3",
+            "c810fa418bacbfb4dd4775ada97cc9ac535e7a812f06e9df7287e39276ec7090"
+          ]
+        },
+        {
+          "index": 5,
+          "proof": [
+            "ea9fc1a1b6e191b460d0d6306e3e870c173f39330f13cda1b70cfc72bdc398ba",
+            "398ebdeb46e179eeffacef4635fd30410954e169b88e22741fa96cffb1022a85",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3",
+            "c810fa418bacbfb4dd4775ada97cc9ac535e7a812f06e9df7287e39276ec7090"
+          ]
+        },
+        {
+          "index": 6,
+          "proof": [
+            "060242692909024231d050c5d4434146ba77da322d450286f577c9f951615d53",
+            "985bb5d36b927800876871da925a7e82abe83a9ddba5882920a007a55ea2b376",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3",
+            "c810fa418bacbfb4dd4775ada97cc9ac535e7a812f06e9df7287e39276ec7090"
+          ]
+        },
+        {
+          "index": 7,
+          "proof": [
+            "676f3782f5b3a5fb4370ed49572cedc523f4a66322269c85f2af0509d17b0a4d",
+            "985bb5d36b927800876871da925a7e82abe83a9ddba5882920a007a55ea2b376",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3",
+            "c810fa418bacbfb4dd4775ada97cc9ac535e7a812f06e9df7287e39276ec7090"
+          ]
+        },
+        {
+          "index": 8,
+          "proof": [
+            "7edc2e557e3cee066514d67849ba7eb860ec99f6cd048bf48c7d6fefc0918250",
+            "a4c763b6e3f4fd46fd3695235e9f7ebddb289e375d54fd532a624a6d17d3cddc",
+            "ca6b7b3e674ac86c1027b59c87c064fc3bc27b313294c75f83bd05fdd13f0dcf"
+          ]
+        },
+        {
+          "index": 9,
+          "proof": [
+            "95ceab0ef2c3135bf4ede6c0bdbed41b01c30848c09b1d79deb7c396fbc77667",
+            "a4c763b6e3f4fd46fd3695235e9f7ebddb289e375d54fd532a624a6d17d3cddc",
+            "ca6b7b3e674ac86c1027b59c87c064fc3bc27b313294c75f83bd05fdd13f0dcf"
+          ]
+        },
+        {
+          "index": 10,
+          "proof": [
+            "eb004c7475cebdb2b1e55a714b90ff144c22f38120ea89638a1f7ab591815205",
+            "ca6b7b3e674ac86c1027b59c87c064fc3bc27b313294c75f83bd05fdd13f0dcf"
+          ]
+        }
+      ]
+    }
+  ],
+  "consistency": [
+    {
+      "leaves": [
+        "leaf-0",
+        "leaf-1",
+        "leaf-2",
+        "leaf-3",
+        "leaf-4",
+        "leaf-5",
+        "leaf-6",
+        "leaf-7"
+      ],
+      "root": "ca6b7b3e674ac86c1027b59c87c064fc3bc27b313294c75f83bd05fdd13f0dcf",
+      "proofs": [
+        {
+          "first": 1,
+          "second": 8,
+          "proof": [
+            "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a"
+          ]
+        },
+        {
+          "first": 2,
+          "second": 8,
+          "proof": [
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a"
+          ]
+        },
+        {
+          "first": 3,
+          "second": 8,
+          "proof": [
+            "fca89f57c9f8c8eb4047a7ff9d333acf9e0f3384b20b255bceab0f216dcca267",
+            "f76836325aec5699d8d71f8e42e9d47c5c29b08059ba296384f7ca40ad3a40ae",
+            "60a53eed0de87a90c8e59427c59c46253c33a76a09502a51801300927b7e6bdc",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a"
+          ]
+        },
+        {
+          "first": 6,
+          "second": 8,
+          "proof": [
+            "985bb5d36b927800876871da925a7e82abe83a9ddba5882920a007a55ea2b376",
+            "398ebdeb46e179eeffacef4635fd30410954e169b88e22741fa96cffb1022a85",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3"
+          ]
+        },
+        {
+          "first": 8,
+          "second": 8,
+          "proof": []
+        }
+      ]
+    },
+    {
+      "leaves": [
+        "leaf-0",
+        "leaf-1",
+        "leaf-2",
+        "leaf-3",
+        "leaf-4",
+        "leaf-5",
+        "leaf-6",
+        "leaf-7",
+        "leaf-8",
+        "leaf-9",
+        "leaf-10"
+      ],
+      "root": "1db5226a80052816fa403f39e329ed282432541d670d8a2f2708ee86a7df10d4",
+      "proofs": [
+        {
+          "first": 1,
+          "second": 11,
+          "proof": [
+            "3145c409f259b7c53e32036090ff76751025a2498ba9823ef718cac50b4e616f",
+            "bd45ff28796704d88bdac51b1df553fda59837b616d6d1cb2114dbc3b087ff69",
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a",
+            "c810fa418bacbfb4dd4775ada97cc9ac535e7a812f06e9df7287e39276ec7090"
+          ]
+        },
+        {
+          "first": 4,
+          "second": 11,
+          "proof": [
+            "f58aaab46122102d66b00c5eb50b13dd763b5f800139b424fda8b1cacae1408a",
+            "c810fa418bacbfb4dd4775ada97cc9ac535e7a812f06e9df7287e39276ec7090"
+          ]
+        },
+        {
+          "first": 7,
+          "second": 11,
+          "proof": [
+            "676f3782f5b3a5fb4370ed49572cedc523f4a66322269c85f2af0509d17b0a4d",
+            "060242692909024231d050c5d4434146ba77da322d450286f577c9f951615d53",
+            "985bb5d36b927800876871da925a7e82abe83a9ddba5882920a007a55ea2b376",
+            "bdd1c5ff55b19cb6b0e7c761bf9a6ccaa27fbbfc07b74f1fabb6e911a0bd2ab3",
+            "c810fa418bacbfb4dd4775ada97cc9ac535e7a812f06e9df7287e39276ec7090"
+          ]
+        },
+        {
+          "first": 11,
+          "second": 11,
+          "proof": []
+        }
+      ]
+    }
+  ],
+  "timestamps": [
+    {
+      "value": 0,
+      "rfc3339": "1970-01-01T00:00:00.000000000Z"
+    },
+    {
+      "value": 1,
+      "rfc3339": "1970-01-01T00:00:01.000000000Z"
+    },
+    {
+      "value": 1717200000,
+      "rfc3339": "2024-06-01T00:00:00.000000000Z"
+    },
+    {
+      "value": 1717200000000000000,
+      "rfc3339": "2024-06-01T00:00:00.000000000Z"
+    },
+    {
+      "value": 1717200000123456789,
+      "rfc3339": "2024-06-01T00:00:00.123456789Z"
+    }
+  ],
+  "events": [
+    {
+      "event": {
+        "schema_version": "1.0.0",
+        "event_id": "evt_a0a374d5bc42fce6e6e583848e2a81bef64cd7de",
+        "timestamp": "2026-05-28T00:00:00.000000000Z",
+        "kind": "generic",
+        "actor": {
+          "agent_id": "a1"
+        },
+        "provenance": {},
+        "attributes": {},
+        "labels": {},
+        "source": {
+          "format": "sdk"
+        }
+      },
+      "event_id": "evt_a0a374d5bc42fce6e6e583848e2a81bef64cd7de",
+      "canonical": "{\"actor\":{\"agent_id\":\"a1\"},\"attributes\":{},\"event_id\":\"evt_a0a374d5bc42fce6e6e583848e2a81bef64cd7de\",\"kind\":\"generic\",\"labels\":{},\"provenance\":{},\"schema_version\":\"1.0.0\",\"source\":{\"format\":\"sdk\"},\"timestamp\":\"2026-05-28T00:00:00.000000000Z\"}",
+      "leaf_hash": "cc7531ffbe52a989fa5b4aba30a5c1055280254eefb00a95692348affcccdd62"
+    },
+    {
+      "event": {
+        "schema_version": "1.0.0",
+        "event_id": "evt_83f3ead533fc7ad92f587bca45bbc2d1b348d93a",
+        "timestamp": "2026-05-28T00:00:00.000000000Z",
+        "kind": "llm_call",
+        "actor": {
+          "agent_id": "loan-agent",
+          "agent_card_ref": "sha256:abcd"
+        },
+        "provenance": {
+          "task_id": "t1",
+          "context_id": "c1",
+          "root_task_id": "t1"
+        },
+        "io": {
+          "input_ref": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+          "output_ref": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+          "input_tokens": 1200,
+          "output_tokens": 345,
+          "total_tokens": 1545,
+          "cost": "0.002310",
+          "cost_currency": "USD"
+        },
+        "model": {
+          "provider": "openai",
+          "request_model": "gpt-4o",
+          "response_model": "gpt-4o-2026"
+        },
+        "tool": {
+          "name": "lookup",
+          "call_id": "call_7"
+        },
+        "oversight": {
+          "status": "approved",
+          "approval_ref": "evt_abc",
+          "reviewer": "alice"
+        },
+        "risk": {
+          "classification": "high",
+          "rationale_ref": "evt_def",
+          "framework": "eu-ai-act"
+        },
+        "attributes": {
+          "operation": "chat",
+          "finish_reasons": [
+            "stop"
+          ],
+          "nested": {
+            "k": 1,
+            "z": [
+              2,
+              3
+            ]
+          }
+        },
+        "labels": {
+          "env": "prod",
+          "team": "credit"
+        },
+        "source": {
+          "format": "otel-genai",
+          "span_id": "s1",
+          "trace_id": "tr1"
+        }
+      },
+      "event_id": "evt_83f3ead533fc7ad92f587bca45bbc2d1b348d93a",
+      "canonical": "{\"actor\":{\"agent_card_ref\":\"sha256:abcd\",\"agent_id\":\"loan-agent\"},\"attributes\":{\"finish_reasons\":[\"stop\"],\"nested\":{\"k\":1,\"z\":[2,3]},\"operation\":\"chat\"},\"event_id\":\"evt_83f3ead533fc7ad92f587bca45bbc2d1b348d93a\",\"io\":{\"cost\":\"0.002310\",\"cost_currency\":\"USD\",\"input_ref\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\",\"input_tokens\":1200,\"output_ref\":\"sha256:2222222222222222222222222222222222222222222222222222222222222222\",\"output_tokens\":345,\"total_tokens\":1545},\"kind\":\"llm_call\",\"labels\":{\"env\":\"prod\",\"team\":\"credit\"},\"model\":{\"provider\":\"openai\",\"request_model\":\"gpt-4o\",\"response_model\":\"gpt-4o-2026\"},\"oversight\":{\"approval_ref\":\"evt_abc\",\"reviewer\":\"alice\",\"status\":\"approved\"},\"provenance\":{\"context_id\":\"c1\",\"root_task_id\":\"t1\",\"task_id\":\"t1\"},\"risk\":{\"classification\":\"high\",\"framework\":\"eu-ai-act\",\"rationale_ref\":\"evt_def\"},\"schema_version\":\"1.0.0\",\"source\":{\"format\":\"otel-genai\",\"span_id\":\"s1\",\"trace_id\":\"tr1\"},\"timestamp\":\"2026-05-28T00:00:00.000000000Z\",\"tool\":{\"call_id\":\"call_7\",\"name\":\"lookup\"}}",
+      "leaf_hash": "045b7cdeb29118f79631b685bdea320dc52606b2c4770ecd373ef3864b440884"
+    },
+    {
+      "event": {
+        "schema_version": "1.0.0",
+        "event_id": "evt_d30279e5491668cf78491bc1551d94437c1dc018",
+        "timestamp": "2026-05-28T00:00:00.000000000Z",
+        "kind": "agent_decision",
+        "actor": {
+          "agent_id": "café-agent ☕"
+        },
+        "provenance": {},
+        "attributes": {
+          "note": "naïve\ttab and <html> & slash/",
+          "emoji": "🔐"
+        },
+        "labels": {},
+        "source": {
+          "format": "sdk"
+        }
+      },
+      "event_id": "evt_d30279e5491668cf78491bc1551d94437c1dc018",
+      "canonical": "{\"actor\":{\"agent_id\":\"café-agent ☕\"},\"attributes\":{\"emoji\":\"🔐\",\"note\":\"naïve\\ttab and <html> & slash/\"},\"event_id\":\"evt_d30279e5491668cf78491bc1551d94437c1dc018\",\"kind\":\"agent_decision\",\"labels\":{},\"provenance\":{},\"schema_version\":\"1.0.0\",\"source\":{\"format\":\"sdk\"},\"timestamp\":\"2026-05-28T00:00:00.000000000Z\"}",
+      "leaf_hash": "0179fbcb679439c873f451c89a4800c0a6bd78d67a4e77093e7ed6616afe92e2"
+    }
+  ],
+  "empty_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

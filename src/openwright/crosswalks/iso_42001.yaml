@@ -1,0 +1,209 @@
+# ISO/IEC 42001:2023 (AI management system) Annex A crosswalk for OpenWright.
+#
+# Maintainer-authored and cited; this is EVIDENCE mapping, NOT a certification
+# audit against ISO/IEC 42001 and NOT legal advice (R-01, C-03, V16). The control
+# mappings below are PENDING qualified specialist / certification-body review.
+#
+# CITATION CAVEAT: ISO/IEC 42001:2023 is a copyrighted, paywalled standard, so
+# this file does NOT reproduce verbatim normative text. Each control cites the
+# official ISO catalogue page for the standard and gives a short PARAPHRASE of the
+# Annex A control's intent (flagged in 'notes' as a paraphrase, not a verbatim
+# quote). Annex A control numbers follow the structure of the published standard;
+# re-verify every clause number and the control wording against the purchased
+# standard text before relying on them.
+crosswalk:
+  id: iso-42001
+  title: "ISO/IEC 42001:2023 — AI Management System, Annex A controls (subset)"
+  version: "1.1.0"
+  source: "ISO/IEC 42001:2023 (First edition, 2023-12), Annex A (reference control objectives and controls)"
+  reviewed_as_of: "2026-06-01"
+  description: >
+    Maps OpenWright runtime agent evidence to a subset of ISO/IEC 42001:2023
+    Annex A controls: A.2 (policies related to AI), A.6 (AI system life cycle —
+    operation/monitoring and event-log recording), A.8 (information for interested
+    parties), A.9 (use of the AI system, including A.9.2 processes for responsible
+    use / human oversight), and A.10 (third-party and customer relationships).
+    Covers the management-system controls a runtime evidence log can substantiate
+    (FR-MAP-09).
+  disclaimer: >
+    This crosswalk produces EVIDENCE that specific controls were exercised at
+    runtime. It does NOT constitute ISO/IEC 42001 certification, a certification-
+    body audit, a conformity assessment, or legal advice. Those determinations are
+    reserved for accredited certification bodies, qualified auditors, and counsel.
+    Mappings are maintainer-authored and pending qualified specialist review (V16);
+    Annex A control numbers and wording must be confirmed against the official,
+    purchased ISO/IEC 42001:2023 text.
+  controls:
+    - id: a.2.policies
+      title: "A.2 — Policies related to AI (risk classification recorded against a framework)"
+      requirement: >
+        Each risk-classification event records both a classification and the
+        governing policy framework it was decided under, evidencing that AI use is
+        governed by a documented, applied policy rather than ad hoc judgement.
+      citation:
+        instrument: "ISO/IEC 42001:2023"
+        clause: "Annex A.2"
+        url: "https://www.iso.org/standard/81230.html"
+        quote: >
+          Policies related to AI: the organization documents and implements
+          policies for the development or use of AI systems.
+        effective_date: "2023-12"
+        notes: >
+          Paraphrase of the A.2 control objective, not verbatim normative text
+          (ISO/IEC 42001 is paywalled). Confirm clause number and wording against
+          the official standard.
+      scope: { kind: ["risk_classification"] }
+      condition:
+        type: all_of
+        conditions:
+          - { type: field, path: "risk.classification", op: exists }
+          - { type: field, path: "risk.framework", op: exists }
+      empty_scope: insufficient_evidence
+      rationale: >
+        A recorded classification tied to a named framework (risk.framework) is
+        runtime evidence that a documented AI policy was actually applied to the
+        decision, which is what A.2 asks an organization to be able to show.
+
+    - id: a.6.2.8
+      title: "A.6.2.8 — AI system recording of event logs"
+      requirement: >
+        AI system operational events are recorded in an append-only, tamper-evident
+        log, providing a traceable, auditable record of operation over the AI
+        system life cycle.
+      citation:
+        instrument: "ISO/IEC 42001:2023"
+        clause: "Annex A.6.2.8"
+        url: "https://www.iso.org/standard/81230.html"
+        quote: >
+          The organization shall determine at which phases of the AI system life
+          cycle event log recording is enabled, and record events accordingly.
+        effective_date: "2023-12"
+        notes: >
+          Paraphrase of the A.6.2.8 control intent (event-log recording), not
+          verbatim normative text. Annex A.6 covers the AI system life cycle;
+          confirm the exact clause number against the official standard.
+      scope:
+        kind: ["llm_call", "tool_call", "agent_decision", "human_approval", "risk_classification", "policy_decision", "incident"]
+      condition: { type: committed }
+      empty_scope: insufficient_evidence
+      # Event-log recording is a completeness obligation: a self-attested
+      # evidence_gap marker (dropped/lost spans) means recording was not complete,
+      # so this control cannot be satisfied while a gap is attested (U1, V8).
+      completeness_sensitive: true
+      rationale: >
+        The append-only Merkle ledger is the recording mechanism; an event's
+        committed presence (with an inclusion proof) is the evidence. Because the
+        log self-attests its own gaps, an attested evidence_gap downgrades this
+        control rather than passing silently.
+
+    - id: a.6.2.6
+      title: "A.6.2.6 — AI system operation and monitoring"
+      requirement: >
+        Day-to-day model and tool operations of the deployed AI system are captured
+        and monitored via recorded, committed telemetry events.
+      citation:
+        instrument: "ISO/IEC 42001:2023"
+        clause: "Annex A.6.2.6"
+        url: "https://www.iso.org/standard/81230.html"
+        quote: >
+          The organization defines and documents how the AI system is operated and
+          monitored day-to-day, including monitoring, repairs, and updates.
+        effective_date: "2023-12"
+        notes: >
+          Paraphrase of the A.6.2.6 control intent (operation and monitoring), not
+          verbatim normative text. Confirm clause number against the official
+          standard.
+      scope: { kind: ["llm_call", "tool_call", "agent_decision"] }
+      condition: { type: committed }
+      empty_scope: insufficient_evidence
+
+    - id: a.8.info
+      title: "A.8 — Information for interested parties (interpretable output of AI decisions)"
+      requirement: >
+        Each agent decision and model call records interpretable output evidence —
+        a referenced output, the responding model, or a finish reason — so that
+        interested parties can be given meaningful information about what the AI
+        system produced (without retaining raw payloads).
+      citation:
+        instrument: "ISO/IEC 42001:2023"
+        clause: "Annex A.8"
+        url: "https://www.iso.org/standard/81230.html"
+        quote: >
+          Information for interested parties: the organization determines and
+          provides the information necessary for relevant interested parties about
+          the AI system.
+        effective_date: "2023-12"
+        notes: >
+          Paraphrase of the A.8 control objective, not verbatim normative text.
+          Confirm clause number and wording against the official standard.
+      scope: { kind: ["agent_decision", "llm_call"] }
+      condition:
+        type: any_of
+        conditions:
+          - { type: field, path: "io.output_ref", op: exists }
+          - { type: field, path: "model.response_model", op: exists }
+          - { type: field, path: "attributes.finish_reasons", op: exists }
+      empty_scope: insufficient_evidence
+
+    - id: a.9.2
+      title: "A.9.2 — Processes for responsible use (human oversight)"
+      requirement: >
+        Each high-risk decision is linked to a recorded human-oversight (approval)
+        event whose oversight status is 'approved', evidencing human judgement /
+        intervention in the use of the AI system.
+      citation:
+        instrument: "ISO/IEC 42001:2023"
+        clause: "Annex A.9.2"
+        url: "https://www.iso.org/standard/81230.html"
+        quote: >
+          Human oversight plays a pivotal role in the responsible use of AI
+          systems, ensuring that decisions made by AI are subject to human
+          judgement and intervention when necessary.
+        effective_date: "2023-12"
+        notes: >
+          A.9 covers use of the AI system; A.9.2 addresses processes for
+          responsible use. Numbering and wording per public references; confirm
+          against the official standard.
+      scope: { kind: ["agent_decision"], risk_classification: ["high"] }
+      condition:
+        type: linked
+        link: approval_ref
+        target: { kind: ["human_approval"], oversight_status: ["approved"] }
+      empty_scope: insufficient_evidence
+      rationale: >
+        A high-risk agent_decision with no linked, approved human_approval event
+        is not_satisfied: this is the pinned responsible-use oversight control.
+
+    - id: a.10.third-party
+      title: "A.10 — Third-party and customer relationships (third-party calls carry oversight state)"
+      requirement: >
+        Each tool call to an external/third-party capability records an explicit
+        oversight status (any of not_required, pending, approved, or rejected),
+        evidencing that responsibilities for third-party AI components are
+        allocated and tracked rather than left unknown.
+      citation:
+        instrument: "ISO/IEC 42001:2023"
+        clause: "Annex A.10"
+        url: "https://www.iso.org/standard/81230.html"
+        quote: >
+          Third-party and customer relationships: the organization understands and
+          allocates responsibilities with respect to third parties in the AI system
+          life cycle.
+        effective_date: "2023-12"
+        notes: >
+          Paraphrase of the A.10 control objective, not verbatim normative text.
+          The predicate uses oversight.status as a proxy for an explicitly
+          allocated responsibility on third-party tool calls; confirm clause number
+          and wording against the official standard.
+      scope: { kind: ["tool_call"] }
+      condition:
+        type: field
+        path: "oversight.status"
+        op: in
+        value: ["not_required", "pending", "approved", "rejected"]
+      empty_scope: insufficient_evidence
+      rationale: >
+        A tool_call is the runtime point where a third-party capability is invoked.
+        An oversight.status that is explicitly set (not the default 'unknown')
+        evidences that responsibility for that third-party interaction was
+        considered and allocated, which is the substance of A.10.

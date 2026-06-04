@@ -1,0 +1,21 @@
+# OpenTelemetry Collector Builder (ocb) manifest for the OpenWright distribution.
+# Build:
+#   builder --config otel/builder-config.yaml
+# Produces ./otel/_build/openwright-otelcol — a collector that exposes a native
+# `openwright` exporter (Option B in docs/OTEL_PROCESSOR_SCOPE.md).
+dist:
+  name: openwright-otelcol
+  description: OpenTelemetry Collector distribution with the OpenWright evidence exporter
+  output_path: ./otel/_build
+  otelcol_version: 0.130.0
+
+receivers:
+  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.130.0
+
+processors:
+  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.130.0
+
+exporters:
+  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.130.0
+  - gomod: github.com/allthingsN/openwright/otel/openwrightexporter v0.0.0
+    path: ./otel/openwrightexporter

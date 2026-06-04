@@ -1,0 +1,81 @@
+# OpenWright managed/hosted offering — the full pipeline as a service (B20).
+#
+# Runs collector + durable ledger + scheduled signed checkpoints + a SEPARATE
+# witness service (independent key, separate container = separate infra) + a
+# coverage dashboard, all self-hosted. Prereqs B3 (durable ledger), B4 (S3/WORM,
+# optional), B8 (witness) are satisfied by the image.
+#
+#   docker compose -f docker-compose.managed.yml up
+#
+#   OTLP ingest:   gRPC :4317 / HTTP :4318   (point your agents here)
+#   Witness:       http://localhost:4319     (GET /pubkey, POST /cosign)
+#   Dashboard:     http://localhost:8080      (coverage over generated reports)
+#
+# Keys are generated into the data volume on first run (operator-controlled, never
+# baked into the image — NFR-SEC-02). Mount your own to override.
+services:
+  keygen:
+    build: .
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        mkdir -p /data/keys /data/ledger /data/checkpoints /data/dashboard &&
+        [ -f /data/keys/collector.pem ] || openwright keygen --out /data/keys/collector.pem &&
+        [ -f /data/keys/witness.pem ]   || openwright keygen --out /data/keys/witness.pem &&
+        echo "keys ready"
+    volumes:
+      - openwright-data:/data
+
+  collector:
+    build: .
+    depends_on:
+      keygen:
+        condition: service_completed_successfully
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        openwright collector --ledger-dir=/data/ledger --host=0.0.0.0
+        --http-port=4318 --grpc-port=4317
+        --key=/data/keys/collector.pem --checkpoint-interval=60
+        --checkpoints=/data/checkpoints
+        ${DOWNSTREAM_OTLP:+--downstream=$$DOWNSTREAM_OTLP}
+    environment:
+      DOWNSTREAM_OTLP: ${DOWNSTREAM_OTLP:-}
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - openwright-data:/data
+
+  witness:
+    build: .
+    depends_on:
+      keygen:
+        condition: service_completed_successfully
+    command: ["witness", "--key=/data/keys/witness.pem", "--host=0.0.0.0", "--port=4319"]
+    ports:
+      - "4319:4319"
+    volumes:
+      - openwright-data:/data
+
+  dashboard:
+    build: .
+    depends_on:
+      keygen:
+        condition: service_completed_successfully
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        ( python -m http.server 8080 --directory /data/dashboard & )
+        && while true; do
+        openwright report /data/ledger --key /data/keys/collector.pem --out /data/report --pdf false 2>/dev/null
+        && openwright dashboard /data/report/report.json --out /data/dashboard/index.html 2>/dev/null
+        || echo "dashboard: ledger empty, waiting";
+        sleep 60; done
+    ports:
+      - "8080:8080"
+    volumes:
+      - openwright-data:/data
+
+volumes:
+  openwright-data:

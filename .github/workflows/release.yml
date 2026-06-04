@@ -1,0 +1,83 @@
+# Release: build the wheel + container, generate an SBOM, and attach SLSA build
+# provenance + cosign signatures (NFR-SEC-03). The SBOM is produced by
+# `openwright sbom`; provenance and signing run in CI with OIDC (keyless cosign).
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write   # for keyless cosign / SLSA provenance (OIDC)
+  packages: write
+  attestations: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - run: pipx install poetry
+      - run: poetry install
+      - name: Build wheel + sdist
+        run: poetry build
+      - name: Generate CycloneDX SBOM
+        run: poetry run openwright sbom --out dist/openwright.cdx.json
+      - uses: actions/upload-artifact@v4
+        with: { name: dist, path: dist/ }
+
+  # Publish the wheel + sdist to PyPI via OIDC trusted publishing (no API token).
+  # Requires the PyPI "trusted publisher" to be configured for owner allthingsN,
+  # repo openwright, workflow release.yml, environment pypi.
+  publish-pypi:
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write   # OIDC — keyless trusted publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - name: Keep only distribution artifacts (drop SBOM/other files)
+        run: find dist -type f ! -name '*.whl' ! -name '*.tar.gz' -delete
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  # NOTE: PEP 740 build provenance for the PyPI wheels is generated automatically
+  # by gh-action-pypi-publish (OIDC), so a separate SLSA generic-generator job is
+  # redundant for the Python artifacts. The container is signed + attested below.
+
+  container:
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write     # push to GHCR
+      id-token: write      # keyless cosign (OIDC)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: sigstore/cosign-installer@v3
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # GHCR image paths must be lowercase; ${GITHUB_REPOSITORY,,} normalizes the owner/name.
+      - name: Build and push image (capture digest)
+        id: img
+        run: |
+          name="ghcr.io/${GITHUB_REPOSITORY,,}"
+          docker build -t "$name:${GITHUB_REF_NAME}" .
+          docker push "$name:${GITHUB_REF_NAME}"
+          # Sign by immutable digest, not the mutable tag.
+          digest=$(docker inspect --format='{{index .RepoDigests 0}}' "$name:${GITHUB_REF_NAME}")
+          echo "ref=$digest" >> "$GITHUB_OUTPUT"
+      - name: Sign image (by digest)
+        run: cosign sign --yes ${{ steps.img.outputs.ref }}
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - name: Attest SBOM
+        run: cosign attest --yes --type cyclonedx --predicate dist/openwright.cdx.json ${{ steps.img.outputs.ref }}

@@ -1,0 +1,15 @@
+{
+  "name": "openwright",
+  "version": "0.6.0",
+  "description": "Independent, offline OpenWright report verifier — runs the audited single-file pure-Python verifier inside WebAssembly (Pyodide). Verifies signed, tamper-evident, control-mapped AI-agent evidence reports.",
+  "type": "module",
+  "main": "index.mjs",
+  "exports": { ".": "./index.mjs" },
+  "files": ["index.mjs", "src/openwright_verifier.py", "README.md"],
+  "bin": { "openwright-verify": "cli.mjs" },
+  "scripts": { "test": "node test.mjs" },
+  "keywords": ["openwright", "verifier", "wasm", "pyodide", "merkle", "ed25519", "eu-ai-act", "evidence", "audit"],
+  "license": "Apache-2.0",
+  "dependencies": { "pyodide": "^0.26.2" },
+  "engines": { "node": ">=18" }
+}

@@ -1,0 +1,67 @@
+# CI: run the full test suite on every push and PR. This is the cheap,
+# credibility-building piece — the SLSA/cosign/SBOM release pipeline
+# (release.yml) stays a template until the first real published release.
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.11 is the developed-against floor; 3.13 matches the release build.
+        python-version: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pipx install poetry
+      - run: poetry install
+      - run: poetry run pytest
+
+  # Continuously verify the Go components: Option B (native Collector exporter)
+  # and Option C (Go evidence core + cross-language conformance/interop).
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pipx install poetry
+      - run: poetry install
+
+      # Option C — the trust-model gate: Go reproduces the Python vectors.
+      - name: core-go conformance (byte-identity)
+        run: cd core-go && go vet ./... && go test ./...
+
+      # Option C — cross-language Ed25519 interop, both directions. Fail if it
+      # skipped or did not pass (the script exits 0 on skip).
+      - name: core-go interop (Python <-> Go)
+        run: poetry run python core-go/verify_interop.py | tee /tmp/interop.out && grep -q "PASS — cross-language" /tmp/interop.out
+
+      # Option B — the native exporter component compiles.
+      - name: openwright exporter compiles
+        run: cd otel/openwrightexporter && go build ./...
+
+      # Option B — build the custom distribution and verify the native exporter
+      # end-to-end, including the byte-identical conformance check.
+      - name: build openwright-otelcol and verify end-to-end
+        run: |
+          go install go.opentelemetry.io/collector/cmd/builder@v0.130.0
+          "$(go env GOPATH)/bin/builder" --config otel/builder-config.yaml
+          OPENWRIGHT_OTELCOL=otel/_build/openwright-otelcol \
+            poetry run python examples/otel_collector/verify_native_exporter.py | tee /tmp/native.out
+          grep -q "PASS — native" /tmp/native.out

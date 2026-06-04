@@ -1,0 +1,36 @@
+# Single-node, self-hosted quickstart (NFR-PORT-02).
+#
+#   docker compose run --rm demo        # run the full end-to-end demo
+#   docker compose up collector         # run the OTLP collector (gRPC :4317 / HTTP :4318)
+#
+# Point your agent's OTLP exporter at the collector and set DOWNSTREAM_OTLP to
+# your real backend (Langfuse/Phoenix/Datadog) to fan telemetry out unchanged.
+services:
+  demo:
+    build: .
+    command: ["demo", "--workdir", "/data/demo"]
+    volumes:
+      - openwright-data:/data
+
+  collector:
+    build: .
+    # Shell form so DOWNSTREAM_OTLP (if set) wires the fan-out flag.
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        openwright collector --ledger-dir=/data/ledger --host=0.0.0.0
+        --http-port=4318 --grpc-port=4317
+        ${DOWNSTREAM_OTLP:+--downstream=$$DOWNSTREAM_OTLP}
+    environment:
+      # Set to your real backend to fan telemetry out unchanged; leave empty to skip.
+      DOWNSTREAM_OTLP: ${DOWNSTREAM_OTLP:-}
+      # Provide your own signing key in production (file mount or env var).
+      # OPENWRIGHT_SIGNING_KEY: ${OPENWRIGHT_SIGNING_KEY:-}
+    ports:
+      - "4317:4317"   # OTLP/gRPC
+      - "4318:4318"   # OTLP/HTTP
+    volumes:
+      - openwright-data:/data
+
+volumes:
+  openwright-data:
