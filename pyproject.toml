@@ -96,3 +96,5 @@ select = ["E7", "E9", "F"]
 "tests/*" = ["E402"]  # tests sometimes import after sys.path / env setup
 # The standalone/WASM verifier is intentionally terse & self-contained (l/r = left/right).
 "src/openwright/browser_verifier.py" = ["E702", "E741"]
+"web/openwright_verifier.py" = ["E702", "E741"]
+"packages/npm/openwright/src/openwright_verifier.py" = ["E702", "E741"]
