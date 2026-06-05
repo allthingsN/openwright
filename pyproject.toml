@@ -76,7 +76,7 @@ ruff = ">=0.6"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
-timeout = 120
+timeout = 180  # headroom for the ingest-server tests when run under coverage
 
 [build-system]
 requires = ["poetry-core>=2.0"]

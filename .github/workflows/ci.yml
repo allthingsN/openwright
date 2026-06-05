@@ -36,7 +36,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pipx install poetry
       - run: poetry install
+      - name: Tests
+        if: matrix.python-version != '3.13'
+        run: poetry run pytest
       - name: Tests + coverage
+        if: matrix.python-version == '3.13'
         run: poetry run pytest --cov=openwright --cov-report=xml --cov-report=term-missing
       - name: Coverage summary → job summary
         if: matrix.python-version == '3.13'
