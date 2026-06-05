@@ -9,20 +9,18 @@ import "crypto/sha256"
 // The split point k is the largest power of two strictly less than n.
 
 func LeafHash(data []byte) []byte {
-	buf := make([]byte, 0, len(data)+1)
-	buf = append(buf, 0x00)
-	buf = append(buf, data...)
-	sum := sha256.Sum256(buf)
-	return sum[:]
+	h := sha256.New()
+	h.Write([]byte{0x00})
+	h.Write(data)
+	return h.Sum(nil)
 }
 
 func NodeHash(left, right []byte) []byte {
-	buf := make([]byte, 0, len(left)+len(right)+1)
-	buf = append(buf, 0x01)
-	buf = append(buf, left...)
-	buf = append(buf, right...)
-	sum := sha256.Sum256(buf)
-	return sum[:]
+	h := sha256.New()
+	h.Write([]byte{0x01})
+	h.Write(left)
+	h.Write(right)
+	return h.Sum(nil)
 }
 
 func EmptyRoot() []byte {
