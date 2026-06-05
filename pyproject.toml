@@ -63,7 +63,7 @@ packages = [
 ]
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.2"
+pytest = ">=9.0.3,<10"
 pytest-timeout = "^2.3"
 # Backend tests (V2/V3/V4) run against real/emulated services when present and
 # skip cleanly otherwise, so the default suite needs no infrastructure.
