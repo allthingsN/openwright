@@ -8,7 +8,7 @@ signed, tamper-evident, control-mapped audit evidence, verifiable offline by any
   <a href="https://pypi.org/project/openwright-core/"><img src="https://img.shields.io/pypi/pyversions/openwright-core" alt="Python"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
   <a href="https://github.com/allthingsN/openwright/actions/workflows/ci.yml"><img src="https://github.com/allthingsN/openwright/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://codecov.io/gh/allthingsN/openwright"><img src="https://codecov.io/gh/allthingsN/openwright/graph/badge.svg" alt="coverage"></a>
+  <a href="https://github.com/allthingsN/openwright/actions/workflows/ci.yml"><img src="https://raw.githubusercontent.com/allthingsN/openwright/badges/coverage.svg" alt="coverage"></a>
 </p>
 
 <p align="center">

@@ -5,7 +5,7 @@ name: ci
 
 on:
   push:
-    branches: ["**"]
+    branches: ["**", "!badges"]   # 'badges' holds only the generated coverage SVG
   pull_request:
 
 permissions:
@@ -45,19 +45,38 @@ jobs:
       - name: Coverage summary → job summary
         if: matrix.python-version == '3.13'
         run: poetry run coverage report --format=markdown >> "$GITHUB_STEP_SUMMARY"
-      - name: Publish coverage to Codecov
-        if: matrix.python-version == '3.13'
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./coverage.xml
-          flags: core
-          fail_ci_if_error: false
       - name: Upload coverage report artifact
         if: matrix.python-version == '3.13'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-core
           path: coverage.xml
+
+  # Self-hosted coverage badge: generate an SVG and publish it to an orphan
+  # 'badges' branch (no external service/subscription; the README points at the raw SVG).
+  coverage-badge:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage-core
+          path: cov
+      - run: |
+          python -m pip install "genbadge[coverage]"
+          genbadge coverage -i cov/coverage.xml -o coverage.svg
+      - name: Publish badge to 'badges' branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch --orphan badges
+          git add -f coverage.svg
+          git commit -m "ci: update coverage badge"
+          git push -f origin badges
 
   # Continuously verify the Go components: Option B (native Collector exporter)
   # and Option C (Go evidence core + cross-language conformance/interop).
