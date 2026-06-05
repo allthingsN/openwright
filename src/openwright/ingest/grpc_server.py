@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import logging
 from concurrent import futures
-from typing import Optional
 
 from .pipeline import EvidencePipeline
 

@@ -37,7 +37,7 @@ import os
 import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Callable, Dict, Iterator, List, Optional, Tuple
+from typing import Callable, Iterator, List, Optional, Tuple
 
 from .canonical import to_rfc3339
 from .events import ComplianceEvent, EventKind, LedgerFields
@@ -48,7 +48,6 @@ from .merkle import (
     leaf_hash,
     shard_super_proof,
     shard_super_root,
-    tree_hash,
 )
 from .signing import Checkpoint, KeySource, sign_checkpoint
 

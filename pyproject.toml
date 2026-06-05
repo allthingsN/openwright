@@ -70,6 +70,8 @@ pytest-timeout = "^2.3"
 psycopg = { version = "^3.1", extras = ["binary"] }
 boto3 = "^1.34"
 moto = { version = "^5.0", extras = ["s3", "kms"] }
+pytest-cov = ">=5"
+ruff = ">=0.6"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -79,3 +81,18 @@ timeout = 120
 [build-system]
 requires = ["poetry-core>=2.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+extend-exclude = [".gotool", "dist", "path", "core-go", "otel/_build"]
+
+[tool.ruff.lint]
+# pyflakes (F, real bugs) + pycodestyle E7/E9; E501 line-length and import order
+# are intentionally not enforced to keep the lint low-noise.
+select = ["E7", "E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E402"]  # tests sometimes import after sys.path / env setup
+# The standalone/WASM verifier is intentionally terse & self-contained (l/r = left/right).
+"src/openwright/browser_verifier.py" = ["E702", "E741"]

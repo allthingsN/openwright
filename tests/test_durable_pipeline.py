@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import threading
-import time
 
 from openwright.adapters.base import SpanData
 from openwright.ingest.durable import DropJournal

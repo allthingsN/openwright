@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import sys
 import tempfile
 from pathlib import Path
 from typing import List, Optional
@@ -93,7 +92,6 @@ def demo(
     page_uri = Path(page).resolve().as_uri()
     _echo("Interactive demo (story + verify-it-yourself in your browser):")
     _echo(f"  {page_uri}")
-    import os
 
     if no_browser or os.environ.get("OPENWRIGHT_NO_BROWSER"):
         _echo("  (auto-open disabled — open the link above to explore and verify)")

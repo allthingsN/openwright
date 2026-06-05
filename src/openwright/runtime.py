@@ -116,7 +116,10 @@ class Runtime:
             import boto3
             bucket, _, prefix = out_dir[len("s3://"):].partition("/")
             prefix = prefix.rstrip("/")
-            key = lambda f: f"{prefix}/{f}" if prefix else f
+
+            def key(f):
+                return f"{prefix}/{f}" if prefix else f
+
             s3 = boto3.client("s3")
             s3.put_object(Bucket=bucket, Key=key(name), Body=report_bytes,
                           ContentType="application/json")

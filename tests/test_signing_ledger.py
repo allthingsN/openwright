@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 from datetime import timedelta
 
-import pytest
 
 from openwright.events import ComplianceEvent, EventKind
 from openwright.ledger import FileLedgerBackend, InMemoryLedgerBackend, Ledger
@@ -70,7 +69,6 @@ def test_ledger_root_matches_merkle():
 
 
 def test_file_ledger_persists_and_reloads(tmp_path):
-    from openwright.merkle import leaf_hash
 
     led = Ledger(FileLedgerBackend(tmp_path / "led"))
     for i in range(4):

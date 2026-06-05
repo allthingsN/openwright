@@ -6,7 +6,6 @@ from datetime import timedelta
 
 import pytest
 
-from openwright.events import ComplianceEvent, EventKind
 from openwright.ledger import InMemoryLedgerBackend, Ledger
 from openwright.sdk import EvidenceClient
 from openwright.signing import InMemoryKeySource

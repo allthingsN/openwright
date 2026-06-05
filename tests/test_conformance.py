@@ -63,7 +63,7 @@ def test_committed_consistency_vectors_verify():
 def test_committed_event_vectors_verify():
     """B12: the committed event-model serialization vectors reproduce from the
     live core — the leaf bytes a Go producer must match byte-for-byte."""
-    from openwright.canonical import canonical_bytes, sha256_hex
+    from openwright.canonical import canonical_bytes
     from openwright.merkle import leaf_hash
 
     for case in _committed()["events"]:

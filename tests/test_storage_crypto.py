@@ -15,7 +15,6 @@ import pytest
 from openwright.events import ComplianceEvent, EventKind
 from openwright.ledger import InMemoryLedgerBackend, Ledger
 from openwright.signing import (
-    Checkpoint,
     InMemoryKeySource,
     public_key_pem,
     public_key_raw_from_pem,
