@@ -35,7 +35,7 @@ reviewed** — they produce *evidence*, not a compliance determination.
 pip install openwright-core
 ```
 
-The distribution is `openwright-core`; it imports as `openwright`. Requires Python 3.10+.
+The distribution is `openwright-core`; it imports as `openwright`. Requires Python 3.11+.
 
 ## Try it (one command)
 

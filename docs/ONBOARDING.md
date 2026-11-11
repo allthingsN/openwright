@@ -16,7 +16,7 @@ poetry install
 poetry run openwright version
 ```
 
-Python 3.10–3.14 is supported (the reference environment is 3.13). Everything
+Python 3.11–3.14 is supported (the reference environment is 3.13). Everything
 needed for the demo, collector, SDK, and reports installs with one command.
 
 ---

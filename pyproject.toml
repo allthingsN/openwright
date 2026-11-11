@@ -6,7 +6,7 @@ description = "Agent Evidence Layer — turns AI-agent runtime behavior into sig
 # internal-repo "Documentation" + "Project layout" sections removed (the source
 # repo is private). The full README.md stays the in-repo doc for org members.
 readme = "README.pypi.md"
-requires-python = ">=3.10,<3.15"
+requires-python = ">=3.11,<3.15"
 license = { text = "Apache-2.0" }
 authors = [{ name = "OpenWright maintainers" }]
 keywords = [
@@ -84,7 +84,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 line-length = 110
-target-version = "py310"
+target-version = "py311"
 extend-exclude = [".gotool", "dist", "path", "core-go", "otel/_build"]
 
 [tool.ruff.lint]
